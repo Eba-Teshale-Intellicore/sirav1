@@ -421,3 +421,29 @@ Temporary Items
 .apdisk
 
 # End of https://www.toptal.com/developers/gitignore/api/django,reactnative
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual Environment
+env/
+venv/
+.venv/
+
+# Django
+*.sqlite3
+media/
+staticfiles/
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
