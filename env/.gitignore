@@ -70,7 +70,7 @@ cover/
 
 # Translations
 *.mo
-
+env/
 # Django stuff:
 
 # Flask stuff:
