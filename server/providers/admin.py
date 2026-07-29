@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import ProfileSkill, ProviderProfile
+from .models.profile import ProviderProfile
+from .models.skill import ProfileSkill
 
 # Register your models here.
 admin.site.register(ProviderProfile)
