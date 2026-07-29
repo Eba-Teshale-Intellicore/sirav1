@@ -16,6 +16,7 @@ class Booking(BaseModel):
         ("cancelled", "Cancelled"),
         ("rejected", "Rejected"),
     )
+  
 
   customer = models.ForeignKey(User, related_name="customer_booking", on_delete=models.CASCADE)
   provider = models.ForeignKey(ProviderProfile, related_name="bookings", on_delete=models.CASCADE)
@@ -28,7 +29,7 @@ class Booking(BaseModel):
   longitude= models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
 
   # Schedule
-  booking_date = models.DateField(auto_now=True)
+  booking_date = models.DateField()
   booking_time = models.TimeField()
 
   #Pricing
@@ -41,7 +42,7 @@ class Booking(BaseModel):
   price_type = models.CharField(max_length=10, choices=PRICE_TYPE, default="quote")
   estimated_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
   final_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-  status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
+  status = models.CharField(max_length=20,choices=STATUS_CHOICES,default="pending",)
   customer_note = models.TextField(blank=True)
 
   class Meta:
