@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "providers",
     "common",
      "accounts",
+     "bookings",
 ]
 
 MIDDLEWARE = [
