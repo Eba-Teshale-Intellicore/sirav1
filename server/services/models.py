@@ -1,22 +1,10 @@
 from django.db import models
 from django.utils.text import slugify
-import uuid
 
-class BaseModel(models.Model):
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False,
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+from common.models import BaseModel
 
-    class Meta:
-        abstract = True
 
-# Create your models here.
 class ServiceCategory(BaseModel):
-
   name = models.CharField(max_length=100,unique=True,db_index=True)
   slug = models.SlugField(unique=True,db_index=True, blank=True)
   icon = models.ImageField(upload_to="service/categories", blank=True, null=True)
