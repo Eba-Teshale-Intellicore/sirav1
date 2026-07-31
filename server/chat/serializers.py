@@ -11,7 +11,7 @@ class MessageSerializer(serializers.ModelSerializer):
       "sender",
       "message",
       "is_read",
-      "created_at"
+      "created_at",
     ]
 
 
