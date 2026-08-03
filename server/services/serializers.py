@@ -3,16 +3,22 @@ from .models import Service, ServiceCategory
 
 class ServiceSerializer(serializers.ModelSerializer):
 
-    category = serializers.SlugRelatedField(
+    category = serializers.PrimaryKeyRelatedField(
+        queryset=ServiceCategory.objects.all(),
+        write_only=True,
+    )
+
+    category_name = serializers.CharField(
+        source="category.name",
         read_only=True,
-        slug_field="name"
     )
 
     class Meta:
         model = Service
         fields = [
             "id",
-            "category",
+            "category",          # POST uses UUID
+            "category_name",     # GET returns name
             "name",
             "slug",
             "image",

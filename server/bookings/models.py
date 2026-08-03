@@ -17,7 +17,6 @@ class Booking(BaseModel):
         ("rejected", "Rejected"),
     )
   
-
   customer = models.ForeignKey(User, related_name="customer_booking", on_delete=models.CASCADE)
   provider = models.ForeignKey(ProviderProfile, related_name="bookings", on_delete=models.CASCADE)
   service = models.ForeignKey(Service, related_name="bookings", on_delete=models.CASCADE)

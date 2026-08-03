@@ -152,11 +152,12 @@ export const globalStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    height: 40,
-    paddingRight: 10,
-    borderRadius: 80,
+    paddingRight: 18,
+    paddingLeft: 2,
+    height: 45,
+    borderRadius: 30,
     backgroundColor: colors.surface,
-    width: "35%",
+    marginRight: 10,
   },
 
   activeCategory: {
@@ -169,7 +170,7 @@ export const globalStyles = StyleSheet.create({
     backgroundColor: colors.surface,
     height: 40,
     width: 40,
-    borderRadius: 100,
+    borderRadius: 50,
   },
 
   filterIcon2: {

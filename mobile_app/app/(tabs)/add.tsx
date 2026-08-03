@@ -1,12 +1,14 @@
-import { View, Text } from "react-native";
-import React from "react";
+import AddPage from "@/components/AddPage";
+import { globalStyles } from "@/styles/global";
+import { ScrollView } from "react-native";
 
-const add = () => {
+export default function Add() {
   return (
-    <View>
-      <Text>add</Text>
-    </View>
+    <ScrollView
+      style={globalStyles.container}
+      showsVerticalScrollIndicator={false}
+    >
+      <AddPage />
+    </ScrollView>
   );
-};
-
-export default add;
+}

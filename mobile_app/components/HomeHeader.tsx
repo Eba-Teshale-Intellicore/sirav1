@@ -1,9 +1,18 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  FlatList,
+} from "react-native";
 import { colors, globalStyles } from "@/styles/global";
-import { getServices } from "@/services/service";
+import { useQuery } from "@tanstack/react-query";
 import { getCategories } from "@/services/categoriy";
+import { getServices } from "@/services/service";
+
 interface Service {
   id: string;
   category: string;
@@ -17,76 +26,61 @@ interface Service {
   is_active: boolean;
   created_at: string;
 }
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  icon: string;
+  description: string;
+  services: Service[];
+}
+
+export function useCategories() {
+  return useQuery({
+    queryKey: ["categories"],
+
+    queryFn: getCategories,
+  });
+}
+
+export function useServices() {
+  return useQuery({
+    queryKey: ["services"],
+
+    queryFn: getServices,
+  });
+}
 
 export const HomeHeader = () => {
-  const [activeCategory, setActiveCategory] = useState("Cleaning");
-  const [categories, setCategories] = useState<any[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const { data: categories = [] } = useCategories();
 
+  const {
+    data: services = [],
+    isLoading,
+    error,
+  } = useServices() as {
+    data: Service[];
+    isLoading: boolean;
+    error: unknown;
+  };
   useEffect(() => {
-    async function loadCategories() {
-      try {
-        const data = await getCategories();
-        setCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
+    if (categories.length > 0 && activeCategory === null) {
+      setActiveCategory(categories[0].name);
     }
+  }, [categories, activeCategory]);
+  const filteredServices =
+    activeCategory === null
+      ? services
+      : services.filter((service) => service.category === activeCategory);
+  if (isLoading) {
+    return <Text style={{ color: "white" }}>Loading services...</Text>;
+  }
+  // Later you'll replace this with skeleton cards.
+  if (error) {
+    return <Text style={{ color: "red" }}>Failed to load services.</Text>;
+  }
 
-    loadCategories();
-  }, []);
-
-  // const categories = [
-  //   {
-  //     name: "Cleaning",
-  //     icon: "sparkles-outline",
-  //   },
-  //   {
-  //     name: "Repairing",
-  //     icon: "construct-outline",
-  //   },
-  //   {
-  //     name: "Plumbing",
-  //     icon: "water-outline",
-  //   },
-  //   {
-  //     name: "Electrical",
-  //     icon: "flash-outline",
-  //   },
-  //   {
-  //     name: "Moving",
-  //     icon: "car-outline",
-  //   },
-  // ];
-  const popularServices = [
-    {
-      id: 1,
-      title: "Home Cleaning",
-      price: "ETB 500",
-      location: "Bole",
-      image: "https://example.com/cleaning.jpg",
-    },
-    {
-      id: 2,
-      title: "Deep Cleaning",
-      price: "ETB 700",
-      location: "Addis Ababa, Bole",
-      image: "https://example.com/cleaning.jpg",
-    },
-  ];
-
-  const [services, setServices] = useState<Service[]>([]);
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const data = await getServices();
-        setServices(data);
-      } catch (error) {
-        console.error("Error fetching services:", error);
-      }
-    }
-    load();
-  }, []);
   return (
     <View>
       <View style={globalStyles.header}>
@@ -141,36 +135,34 @@ export const HomeHeader = () => {
           </TouchableOpacity>
         </View>
         <View style={globalStyles.category}>
-          {categories.map((category, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => setActiveCategory(category.name)}
-              style={[
-                globalStyles.categorysContainer,
-                activeCategory === category.name && globalStyles.activeCategory,
-              ]}
-            >
-              {/* <View style={globalStyles.buttonContainer}>
-                <Ionicons
-                  name={category.icon}
-                  size={22}
-                  style={globalStyles.filterIcon2}
-                />
-              </View> */}
-              <View style={globalStyles.buttonContainer}>
-                <Image
-                  source={{ uri: category.icon }}
-                  style={{
-                    width: 25,
-                    height: 25,
-                    borderRadius: 5,
-                  }}
-                />
-              </View>
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            data={categories}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() => setActiveCategory(item.name)}
+                style={[
+                  globalStyles.categorysContainer,
+                  activeCategory === item.name && globalStyles.activeCategory,
+                ]}
+              >
+                <View style={globalStyles.buttonContainer}>
+                  <Image
+                    source={{ uri: item.icon }}
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 16,
+                    }}
+                  />
+                </View>
 
-              <Text style={globalStyles.textInput2}>{category.name}</Text>
-            </TouchableOpacity>
-          ))}
+                <Text style={globalStyles.textInput2}>{item.name}</Text>
+              </TouchableOpacity>
+            )}
+          />
         </View>
       </View>
       <View style={globalStyles.popular}>
@@ -180,38 +172,42 @@ export const HomeHeader = () => {
             <Text style={globalStyles.categorySubTitle}>See All</Text>
           </TouchableOpacity>
         </View>
-        {services.map((service, index) => (
-          <View style={globalStyles.serviceCard} key={service.id}>
-            <Image
-              source={{ uri: service.image }}
-              style={globalStyles.serviceImage}
-            />
+        <FlatList
+          data={filteredServices}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={globalStyles.serviceCard} key={item.id}>
+              <Image
+                source={{ uri: item.image }}
+                style={globalStyles.serviceImage}
+              />
 
-            <TouchableOpacity style={globalStyles.favoriteButton}>
-              <Ionicons name="heart-outline" size={22} color={colors.text} />
-            </TouchableOpacity>
+              <TouchableOpacity style={globalStyles.favoriteButton}>
+                <Ionicons name="heart-outline" size={22} color={colors.text} />
+              </TouchableOpacity>
 
-            <View style={globalStyles.serviceInfo}>
-              <Text style={globalStyles.serviceTitle}>{service.name}</Text>
+              <View style={globalStyles.serviceInfo}>
+                <Text style={globalStyles.serviceTitle}>{item.name}</Text>
 
-              <Text style={globalStyles.servicePrice}>
-                ETB {service.starting_price}
-              </Text>
+                <Text style={globalStyles.servicePrice}>
+                  ETB {item.starting_price}
+                </Text>
 
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Ionicons
-                  name="location-outline"
-                  size={16}
-                  color={colors.primary}
-                />
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Ionicons
+                    name="location-outline"
+                    size={16}
+                    color={colors.primary}
+                  />
 
-                {/* <Text style={globalStyles.serviceLocation}>
+                  {/* <Text style={globalStyles.serviceLocation}>
                   {service.location}
                 </Text> */}
+                </View>
               </View>
             </View>
-          </View>
-        ))}
+          )}
+        />
       </View>
     </View>
   );
