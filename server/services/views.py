@@ -13,6 +13,6 @@ class ServiceCategoryViewSet(ModelViewSet):
   permission_classes = [AllowAny]
 
 class ServiceViewSet(ModelViewSet):
-  queryset = Service.objects.filter(is_active=True)
+  queryset = Service.objects.all()
   serializer_class = ServiceSerializer
   permission_classes = [AllowAny]
