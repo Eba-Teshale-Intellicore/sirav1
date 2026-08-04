@@ -6,6 +6,11 @@ export const getServices = async () => {
 };
 
 export const postService = async (formData: FormData) => {
-  const res = await api.post("/api/v1/services/", formData);
+  const res = await api.post("/api/v1/services/", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
   return res.data;
 };
