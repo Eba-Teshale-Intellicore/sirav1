@@ -70,12 +70,16 @@ export const HomeHeader = () => {
     if (categories.length > 0 && activeCategory === null) {
       setActiveCategory(categories[0].id);
     }
-  }, []);
+  }, [categories, activeCategory]);
 
+  // const filteredServices =
+  //   activeCategory === null
+  //     ? services
+  //     : services.filter((service) => service.category_name === activeCategory);
   const filteredServices =
     activeCategory === null
       ? services
-      : services.filter((service) => service.category_name === activeCategory);
+      : services.filter((service) => service.category === activeCategory);
 
   if (isLoading) {
     return <Text style={{ color: "white" }}>Loading services...</Text>;
@@ -146,11 +150,10 @@ export const HomeHeader = () => {
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <TouchableOpacity
-                // onPress={() => setActiveCategory(item.name)}
                 onPress={() => setActiveCategory(item.id)}
                 style={[
                   globalStyles.categorysContainer,
-                  activeCategory === item.name && globalStyles.activeCategory,
+                  activeCategory === item.id && globalStyles.activeCategory,
                 ]}
               >
                 <View style={globalStyles.buttonContainer}>
