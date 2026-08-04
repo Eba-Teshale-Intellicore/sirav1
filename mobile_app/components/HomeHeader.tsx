@@ -16,6 +16,7 @@ import { getServices } from "@/services/service";
 interface Service {
   id: string;
   category: string;
+  category_name: string;
   name: string;
   slug: string;
   image: string;
@@ -64,15 +65,22 @@ export const HomeHeader = () => {
     isLoading: boolean;
     error: unknown;
   };
+  // useEffect(() => {
+  //   if (categories.length > 0 && activeCategory === null) {
+  //     setActiveCategory(categories[0].name);
+  //   }
+  // }, [categories, activeCategory]);
   useEffect(() => {
     if (categories.length > 0 && activeCategory === null) {
-      setActiveCategory(categories[0].name);
+      setActiveCategory(categories[0].id);
     }
-  }, [categories, activeCategory]);
+  }, []);
+
   const filteredServices =
     activeCategory === null
       ? services
-      : services.filter((service) => service.category === activeCategory);
+      : services.filter((service) => service.category_name === activeCategory);
+
   if (isLoading) {
     return <Text style={{ color: "white" }}>Loading services...</Text>;
   }
@@ -142,7 +150,8 @@ export const HomeHeader = () => {
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <TouchableOpacity
-                onPress={() => setActiveCategory(item.name)}
+                // onPress={() => setActiveCategory(item.name)}
+                onPress={() => setActiveCategory(item.id)}
                 style={[
                   globalStyles.categorysContainer,
                   activeCategory === item.name && globalStyles.activeCategory,

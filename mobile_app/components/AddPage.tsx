@@ -23,9 +23,12 @@ export function usePostService() {
   return useMutation({
     mutationFn: postService,
 
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("POST SUCCESS:", data);
+
       queryClient.invalidateQueries({
         queryKey: ["services"],
+        exact: true,
       });
     },
   });
@@ -61,6 +64,10 @@ export default function AddPage() {
         type: "image/jpeg",
       } as any);
     }
+    if (!category) {
+      alert("Please select a category.");
+      return;
+    }
     console.log({
       title,
       category,
@@ -69,6 +76,7 @@ export default function AddPage() {
       startingPrice,
       image,
     });
+    console.log("Selected category:", category);
     mutate(formData, {
       onSuccess: () => {
         alert("Service posted!");
