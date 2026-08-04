@@ -11,7 +11,15 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+# from os import getenv
+# from dotenv import load_dotenv
 
+# load_dotenv()
+import os
+import dj_database_url
+from dotenv import load_dotenv
+
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -23,7 +31,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-h7t80i@vqctnf_r-!vrna-9c*_l93fkaw7qz(jl2cf8&l0x56x'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+# DEBUG = False
+DEBUG =DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
 # ALLOWED_HOSTS = []
 ALLOWED_HOSTS = [
@@ -97,11 +106,31 @@ WSGI_APPLICATION = 'sirav1_main.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": getenv("DATABASE_NAME"),
+#         "USER": getenv("DATABASE_USER"),
+#         "PASSWORD": getenv("DATABASE_PASSWORD"),
+#         "HOST": getenv("DATABASE_HOST"),
+#         "PORT": getenv("DATABASE_PORT", "5432"),
+#         "OPTIONS": {
+#             "sslmode": "require",
+#         },
+#     }
+# }
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": dj_database_url.config(
+        default=os.getenv("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True,
+    )
 }
 AUTH_USER_MODEL = "accounts.User"
 

@@ -65,11 +65,7 @@ export const HomeHeader = () => {
     isLoading: boolean;
     error: unknown;
   };
-  // useEffect(() => {
-  //   if (categories.length > 0 && activeCategory === null) {
-  //     setActiveCategory(categories[0].name);
-  //   }
-  // }, [categories, activeCategory]);
+
   useEffect(() => {
     if (categories.length > 0 && activeCategory === null) {
       setActiveCategory(categories[0].id);
