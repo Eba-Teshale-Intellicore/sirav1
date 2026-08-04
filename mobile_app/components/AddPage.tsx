@@ -56,11 +56,13 @@ export default function AddPage() {
     formData.append("category", category);
     formData.append("price_type", priceType);
     formData.append("starting_price", startingPrice);
+    formData.append("is_active", "true");
 
     if (image) {
+      const filename = `service-${Date.now()}.jpg`;
       formData.append("image", {
         uri: image,
-        name: "service.jpg",
+        name: filename,
         type: "image/jpeg",
       } as any);
     }

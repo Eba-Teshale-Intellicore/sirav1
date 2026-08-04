@@ -7,7 +7,10 @@ import {
   TouchableOpacity,
   Image,
   FlatList,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from "react-native";
+
 import { colors, globalStyles } from "@/styles/global";
 import { useQuery } from "@tanstack/react-query";
 import { getCategories } from "@/services/categoriy";
@@ -15,7 +18,7 @@ import { getServices } from "@/services/service";
 
 interface Service {
   id: string;
-  category: string;
+  category?: string;
   category_name: string;
   name: string;
   slug: string;
@@ -23,10 +26,11 @@ interface Service {
   description: string;
   price_type: string;
   starting_price: string;
-  duration: number;
+  duration: number | null;
   is_active: boolean;
   created_at: string;
 }
+
 interface Category {
   id: string;
   name: string;
@@ -37,34 +41,31 @@ interface Category {
 }
 
 export function useCategories() {
-  return useQuery({
+  return useQuery<Category[]>({
     queryKey: ["categories"],
-
     queryFn: getCategories,
   });
 }
 
 export function useServices() {
-  return useQuery({
+  return useQuery<Service[]>({
     queryKey: ["services"],
-
     queryFn: getServices,
   });
 }
 
 export const HomeHeader = () => {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const { data: categories = [] } = useCategories();
+  const [showStickySearch, setShowStickySearch] = useState(false);
+
+  const { data: categories = [], isLoading: categoriesLoading } =
+    useCategories();
 
   const {
     data: services = [],
-    isLoading,
+    isLoading: servicesLoading,
     error,
-  } = useServices() as {
-    data: Service[];
-    isLoading: boolean;
-    error: unknown;
-  };
+  } = useServices();
 
   useEffect(() => {
     if (categories.length > 0 && activeCategory === null) {
@@ -77,142 +78,233 @@ export const HomeHeader = () => {
       ? services
       : services.filter((service) => service.category === activeCategory);
 
-  if (isLoading) {
-    return <Text style={{ color: "white" }}>Loading services...</Text>;
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const y = event.nativeEvent.contentOffset.y;
+
+    // Change this number depending on your header height
+    if (y >= 120) {
+      setShowStickySearch(true);
+    } else {
+      setShowStickySearch(false);
+    }
+  };
+
+  if (categoriesLoading || servicesLoading) {
+    return (
+      <View style={globalStyles.container}>
+        <Text style={{ color: colors.text }}>Loading...</Text>
+      </View>
+    );
   }
-  // Later you'll replace this with skeleton cards.
+
   if (error) {
-    return <Text style={{ color: "red" }}>Failed to load services.</Text>;
+    return (
+      <View style={globalStyles.container}>
+        <Text style={{ color: "red" }}>Failed to load services.</Text>
+      </View>
+    );
   }
 
   return (
-    <View>
-      <View style={globalStyles.header}>
-        <View style={globalStyles.homeHeader}>
-          <View>
-            <Text style={globalStyles.location}>Location</Text>
+    <View style={{ flex: 1 }}>
+      {/* =====================================================
+          STICKY SEARCH
+      ====================================================== */}
 
-            <View style={globalStyles.direction}>
-              <Ionicons
-                name="location-outline"
-                size={20}
-                style={globalStyles.mapicon}
-              />
-
-              <Text style={globalStyles.place}>Addis Ababa, Ethiopia</Text>
-            </View>
-          </View>
-
-          <TouchableOpacity style={globalStyles.notification}>
-            <Ionicons
-              name="notifications-outline"
-              size={28}
-              style={globalStyles.notificationIcon}
-            />
-          </TouchableOpacity>
+      {showStickySearch && (
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 100,
+            paddingHorizontal: 10,
+            paddingVertical: 20,
+            borderBottomLeftRadius: 30,
+            borderBottomRightRadius: 30,
+            backgroundColor: colors.header,
+          }}
+        >
+          <SearchBar />
         </View>
+      )}
 
-        <View style={globalStyles.searchContainer}>
-          <View style={globalStyles.searchInput}>
-            <Ionicons name="search-outline" size={20} color={colors.primary} />
-            <TextInput
-              placeholder="Search"
-              placeholderTextColor={colors.textSecondary}
-              style={globalStyles.textInput}
-            />
-          </View>
+      {/* =====================================================
+          MAIN VERTICAL LIST
+      ====================================================== */}
 
-          <TouchableOpacity style={globalStyles.filterIconContainer}>
-            <Ionicons
-              name="options-outline"
-              size={22}
-              style={globalStyles.filterIcon}
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View style={globalStyles.categories}>
-        <View style={globalStyles.categoriespace}>
-          <Text style={globalStyles.categoryTitle}>Service Categories</Text>
-          <TouchableOpacity>
-            <Text style={globalStyles.categorySubTitle}>See All</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={globalStyles.category}>
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={categories}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={() => setActiveCategory(item.id)}
-                style={[
-                  globalStyles.categorysContainer,
-                  activeCategory === item.id && globalStyles.activeCategory,
-                ]}
-              >
-                <View style={globalStyles.buttonContainer}>
-                  <Image
-                    source={{ uri: item.icon }}
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 16,
-                    }}
-                  />
+      <FlatList
+        data={filteredServices}
+        keyExtractor={(item) => item.id}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+        showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          <>
+            {/* HEADER */}
+
+            <View style={globalStyles.header}>
+              <View style={globalStyles.homeHeader}>
+                <View>
+                  <Text style={globalStyles.location}>Location</Text>
+
+                  <View style={globalStyles.direction}>
+                    <Ionicons
+                      name="location-outline"
+                      size={20}
+                      style={globalStyles.mapicon}
+                    />
+
+                    <Text style={globalStyles.place}>
+                      Addis Ababa, Ethiopia
+                    </Text>
+                  </View>
                 </View>
 
-                <Text style={globalStyles.textInput2}>{item.name}</Text>
-              </TouchableOpacity>
-            )}
-          />
-        </View>
-      </View>
-      <View style={globalStyles.popular}>
-        <View style={globalStyles.categoriespace}>
-          <Text style={globalStyles.categoryTitle}>Popular Services</Text>
-          <TouchableOpacity>
-            <Text style={globalStyles.categorySubTitle}>See All</Text>
-          </TouchableOpacity>
-        </View>
-        <FlatList
-          data={filteredServices}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={globalStyles.serviceCard} key={item.id}>
-              <Image
-                source={{ uri: item.image }}
-                style={globalStyles.serviceImage}
-              />
+                <TouchableOpacity style={globalStyles.notification}>
+                  <Ionicons
+                    name="notifications-outline"
+                    size={28}
+                    style={globalStyles.notificationIcon}
+                  />
+                </TouchableOpacity>
+              </View>
 
-              <TouchableOpacity style={globalStyles.favoriteButton}>
-                <Ionicons name="heart-outline" size={22} color={colors.text} />
-              </TouchableOpacity>
+              {/* NORMAL SEARCH */}
 
-              <View style={globalStyles.serviceInfo}>
-                <Text style={globalStyles.serviceTitle}>{item.name}</Text>
+              <SearchBar />
+            </View>
 
-                <Text style={globalStyles.servicePrice}>
-                  ETB {item.starting_price}
+            {/* CATEGORIES */}
+
+            <View style={globalStyles.categories}>
+              <View style={globalStyles.categoriespace}>
+                <Text style={globalStyles.categoryTitle}>
+                  Service Categories
                 </Text>
 
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Ionicons
-                    name="location-outline"
-                    size={16}
-                    color={colors.primary}
-                  />
+                <TouchableOpacity>
+                  <Text style={globalStyles.categorySubTitle}>See All</Text>
+                </TouchableOpacity>
+              </View>
 
-                  {/* <Text style={globalStyles.serviceLocation}>
-                  {service.location}
-                </Text> */}
-                </View>
+              <FlatList
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                data={categories}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    onPress={() => setActiveCategory(item.id)}
+                    style={[
+                      globalStyles.categorysContainer,
+
+                      activeCategory === item.id && globalStyles.activeCategory,
+                    ]}
+                  >
+                    <View style={globalStyles.buttonContainer}>
+                      <Image
+                        source={{ uri: item.icon }}
+                        style={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: 16,
+                        }}
+                      />
+                    </View>
+
+                    <Text style={globalStyles.textInput2}>{item.name}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
+
+            {/* POPULAR TITLE */}
+
+            <View style={globalStyles.popular}>
+              <View style={globalStyles.categoriespace}>
+                <Text style={globalStyles.categoryTitle}>Popular Services</Text>
+
+                <TouchableOpacity>
+                  <Text style={globalStyles.categorySubTitle}>See All</Text>
+                </TouchableOpacity>
               </View>
             </View>
-          )}
-        />
-      </View>
+          </>
+        }
+        renderItem={({ item }) => (
+          <View style={globalStyles.serviceCard}>
+            <Image
+              source={{ uri: item.image }}
+              style={globalStyles.serviceImage}
+            />
+
+            <TouchableOpacity style={globalStyles.favoriteButton}>
+              <Ionicons name="heart-outline" size={22} color={colors.text} />
+            </TouchableOpacity>
+
+            <View style={globalStyles.serviceInfo}>
+              <Text style={globalStyles.serviceTitle}>{item.name}</Text>
+
+              <Text style={globalStyles.servicePrice}>
+                ETB {item.starting_price}
+              </Text>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <Ionicons
+                  name="location-outline"
+                  size={16}
+                  color={colors.primary}
+                />
+              </View>
+            </View>
+          </View>
+        )}
+        ListEmptyComponent={
+          <Text
+            style={{
+              color: colors.text,
+              padding: 20,
+            }}
+          >
+            No services available.
+          </Text>
+        }
+      />
     </View>
   );
 };
+
+/* =========================================================
+   SEARCH COMPONENT
+========================================================= */
+
+function SearchBar() {
+  return (
+    <View style={globalStyles.searchContainer}>
+      <View style={globalStyles.searchInput}>
+        <Ionicons name="search-outline" size={20} color={colors.primary} />
+
+        <TextInput
+          placeholder="Search"
+          placeholderTextColor={colors.textSecondary}
+          style={globalStyles.textInput}
+        />
+      </View>
+
+      <TouchableOpacity style={globalStyles.filterIconContainer}>
+        <Ionicons
+          name="options-outline"
+          size={22}
+          style={globalStyles.filterIcon}
+        />
+      </TouchableOpacity>
+    </View>
+  );
+}
