@@ -1,8 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
-
 from common.models import BaseModel
-
 
 class ServiceCategory(BaseModel):
   name = models.CharField(max_length=100,unique=True,db_index=True)
@@ -10,7 +8,6 @@ class ServiceCategory(BaseModel):
   icon = models.ImageField(upload_to="service/categories", blank=True, null=True)
   description = models.TextField(blank=True)
   is_active = models.BooleanField(default=True)
-
 
   def save(self, *args, **kwargs):
         if not self.slug:
@@ -23,7 +20,6 @@ class ServiceCategory(BaseModel):
 
   def __str__(self):
       return self.name
-
 
 class Service(BaseModel):
     PRICE_TYPE = (

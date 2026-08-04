@@ -8,7 +8,7 @@ from .serializers import ServiceCategorySerializer, ServiceSerializer
 
 
 class ServiceCategoryViewSet(ModelViewSet):
-  queryset = ServiceCategory.objects.filter(is_active=True)
+  queryset = ServiceCategory.objects.all()
   serializer_class = ServiceCategorySerializer
   permission_classes = [AllowAny]
 
