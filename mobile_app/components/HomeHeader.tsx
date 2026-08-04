@@ -72,10 +72,6 @@ export const HomeHeader = () => {
     }
   }, [categories, activeCategory]);
 
-  // const filteredServices =
-  //   activeCategory === null
-  //     ? services
-  //     : services.filter((service) => service.category_name === activeCategory);
   const filteredServices =
     activeCategory === null
       ? services
