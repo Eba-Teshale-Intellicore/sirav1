@@ -9,7 +9,6 @@ class ServiceCategory(BaseModel):
 #   icon = models.ImageField(upload_to="service/categories", blank=True, null=True)
   icon = CloudinaryField(
     "icon",
-    folder="sira/categories",
     blank=True,
     null=True,
 )
@@ -46,7 +45,6 @@ class Service(BaseModel):
     # image = models.ImageField(upload_to="services/", blank=True, null=True)
     image = CloudinaryField(
         "image",
-        folder="sira/services",
         blank=True,
         null=True,
     )

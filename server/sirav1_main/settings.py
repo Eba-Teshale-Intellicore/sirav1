@@ -15,13 +15,16 @@ from pathlib import Path
 # from dotenv import load_dotenv
 
 # load_dotenv()
-import os
-import dj_database_url
-import cloudinary
 
 from dotenv import load_dotenv
-
 load_dotenv()
+
+import cloudinary
+import cloudinary.uploader
+import dj_database_url
+
+import os
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -33,9 +36,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-h7t80i@vqctnf_r-!vrna-9c*_l93fkaw7qz(jl2cf8&l0x56x'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = False
+DEBUG = False
 # DEBUG =DEBUG = os.getenv("DEBUG", "False").lower() == "true"
-DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
 # ALLOWED_HOSTS = []
 ALLOWED_HOSTS = [
@@ -197,4 +199,5 @@ cloudinary.config(
     cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
     api_key=os.getenv("CLOUDINARY_API_KEY"),
     api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+    secure = True
 )
