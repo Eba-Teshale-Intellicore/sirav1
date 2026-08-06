@@ -17,6 +17,7 @@ class ServiceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Service
+
         fields = [
             "id",
             "category",
@@ -44,12 +45,14 @@ class ServiceSerializer(serializers.ModelSerializer):
 
 class ServiceCategorySerializer(serializers.ModelSerializer):
 
-    services = ServiceSerializer(many=True, read_only=True)
-
-    icon = serializers.SerializerMethodField()
+    services = ServiceSerializer(
+        many=True,
+        read_only=True,
+    )
 
     class Meta:
         model = ServiceCategory
+
         fields = [
             "id",
             "name",
@@ -60,12 +63,3 @@ class ServiceCategorySerializer(serializers.ModelSerializer):
             "created_at",
             "services",
         ]
-
-    def get_icon(self, obj):
-        if not obj.icon:
-            return None
-
-        try:
-            return obj.icon.url
-        except Exception:
-            return str(obj.icon)

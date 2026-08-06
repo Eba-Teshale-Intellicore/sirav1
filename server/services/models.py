@@ -4,29 +4,40 @@ from common.models import BaseModel
 from cloudinary.models import CloudinaryField
 
 class ServiceCategory(BaseModel):
-  name = models.CharField(max_length=100,unique=True,db_index=True)
-  slug = models.SlugField(unique=True,db_index=True, blank=True)
-#   icon = models.ImageField(upload_to="service/categories", blank=True, null=True)
-  icon = CloudinaryField(
-    "icon",
-    blank=True,
-    null=True,
-)
-  description = models.TextField(blank=True)
-  is_active = models.BooleanField(default=True)
+    name = models.CharField(
+        max_length=100,
+        unique=True,
+        db_index=True,
+    )
 
-  def save(self, *args, **kwargs):
+    slug = models.SlugField(
+        unique=True,
+        db_index=True,
+        blank=True,
+    )
+
+    # Example: "plumbing", "cleaning_services", "build"
+    icon = models.CharField(
+        max_length=100,
+        blank=True,
+        default="home_repair_service",
+    )
+
+    description = models.TextField(blank=True)
+
+    is_active = models.BooleanField(default=True)
+
+    def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
 
         super().save(*args, **kwargs)
-        
-  class Meta:
+
+    class Meta:
         ordering = ["name"]
 
-  def __str__(self):
-      return self.name
-
+    def __str__(self):
+        return self.name
 class Service(BaseModel):
     PRICE_TYPE = (
         ("hourly", "Hourly"),
@@ -75,3 +86,4 @@ class Service(BaseModel):
 
     def __str__(self):
         return self.name
+
