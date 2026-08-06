@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "cloudinary",
+    "cloudinary_storage",
 
     "services",
     "providers",
