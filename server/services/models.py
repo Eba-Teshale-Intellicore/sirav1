@@ -1,11 +1,18 @@
 from django.db import models
 from django.utils.text import slugify
 from common.models import BaseModel
+from cloudinary.models import CloudinaryField
 
 class ServiceCategory(BaseModel):
   name = models.CharField(max_length=100,unique=True,db_index=True)
   slug = models.SlugField(unique=True,db_index=True, blank=True)
-  icon = models.ImageField(upload_to="service/categories", blank=True, null=True)
+#   icon = models.ImageField(upload_to="service/categories", blank=True, null=True)
+  icon = CloudinaryField(
+    "icon",
+    folder="sira/categories",
+    blank=True,
+    null=True,
+)
   description = models.TextField(blank=True)
   is_active = models.BooleanField(default=True)
 
@@ -36,7 +43,13 @@ class Service(BaseModel):
 )
     name = models.CharField(max_length=100, db_index=True)
     slug = models.SlugField(unique=True,db_index=True, blank=True)
-    image = models.ImageField(upload_to="services/", blank=True, null=True)
+    # image = models.ImageField(upload_to="services/", blank=True, null=True)
+    image = CloudinaryField(
+        "image",
+        folder="sira/services",
+        blank=True,
+        null=True,
+    )
     description = models.TextField(blank=True, null=True)
     price_type = models.CharField(max_length=20, choices=PRICE_TYPE, default="hourly")
     starting_price = models.DecimalField(

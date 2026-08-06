@@ -22,13 +22,18 @@ export default function RootLayout() {
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          {/* <Stack.Screen
-          name="add/index"
-          options={{
-            title: "Add Service",
-            headerShown: true,
-          }}
-        /> */}
+          <Stack.Screen
+            name="categories"
+            options={{
+              headerShown: false,
+              title: "Categories",
+            }}
+          />
+          <Stack.Screen
+            name="category/[id]"
+            options={{ headerShown: false, title: "detail Categories" }}
+          />
+          <Stack.Screen name="services" options={{ headerShown: false }} />
           <Stack.Screen
             name="modal"
             options={{ presentation: "modal", title: "Modal" }}

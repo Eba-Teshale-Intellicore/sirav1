@@ -12,49 +12,11 @@ import {
 } from "react-native";
 
 import { colors, globalStyles } from "@/styles/global";
-import { useQuery } from "@tanstack/react-query";
-import { getCategories } from "@/services/categoriy";
-import { getServices } from "@/services/service";
-
-interface Service {
-  id: string;
-  category?: string;
-  category_name: string;
-  name: string;
-  slug: string;
-  image: string;
-  description: string;
-  price_type: string;
-  starting_price: string;
-  duration: number | null;
-  is_active: boolean;
-  created_at: string;
-}
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  icon: string;
-  description: string;
-  services: Service[];
-}
-
-export function useCategories() {
-  return useQuery<Category[]>({
-    queryKey: ["categories"],
-    queryFn: getCategories,
-  });
-}
-
-export function useServices() {
-  return useQuery<Service[]>({
-    queryKey: ["services"],
-    queryFn: getServices,
-  });
-}
+import { useRouter } from "expo-router";
+import { useCategories, useServices } from "@/hooks/useCategories";
 
 export const HomeHeader = () => {
+  const router = useRouter();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [showStickySearch, setShowStickySearch] = useState(false);
 
@@ -183,8 +145,7 @@ export const HomeHeader = () => {
                 <Text style={globalStyles.categoryTitle}>
                   Service Categories
                 </Text>
-
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => router.push("/categories")}>
                   <Text style={globalStyles.categorySubTitle}>See All</Text>
                 </TouchableOpacity>
               </View>
@@ -226,7 +187,7 @@ export const HomeHeader = () => {
               <View style={globalStyles.categoriespace}>
                 <Text style={globalStyles.categoryTitle}>Popular Services</Text>
 
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => router.push("/services")}>
                   <Text style={globalStyles.categorySubTitle}>See All</Text>
                 </TouchableOpacity>
               </View>

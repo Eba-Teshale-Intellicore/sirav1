@@ -15,7 +15,7 @@ import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postService } from "@/services/service";
-import { useCategories } from "./HomeHeader";
+import { useCategories } from "@/hooks/useCategories";
 
 export function usePostService() {
   const queryClient = useQueryClient();
@@ -157,11 +157,6 @@ export default function AddPage() {
               dropdownIconColor={colors.primary}
               style={{ color: colors.text }}
             >
-              {/* <Picker.Item label="Select Category" value="" />
-              <Picker.Item label="Cleaning" value="Cleaning" />
-              <Picker.Item label="Plumbing" value="Plumbing" />
-              <Picker.Item label="Electrical" value="Electrical" />
-              <Picker.Item label="Moving" value="Moving" /> */}
               <Picker.Item label="Select Category" value="" />
 
               {categories.map((item) => (
