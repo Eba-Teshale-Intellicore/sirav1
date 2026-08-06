@@ -1,4 +1,4 @@
-import { globalStyles } from "@/styles/add";
+import { addStyles } from "@/styles/add";
 import React, { useState } from "react";
 import {
   ScrollView,
@@ -118,24 +118,20 @@ export default function AddPage() {
   };
 
   return (
-    <ScrollView style={globalStyles.container}>
-      <View style={globalStyles.header}>
-        <View style={globalStyles.head}>
+    <ScrollView style={addStyles.container}>
+      <View style={addStyles.header}>
+        <View style={addStyles.head}>
           <TouchableOpacity onPress={() => router.back()}>
-            <Ionicons
-              name="arrow-back"
-              size={26}
-              style={globalStyles.backIcon}
-            />
+            <Ionicons name="arrow-back" size={26} style={addStyles.backIcon} />
           </TouchableOpacity>
-          <Text style={globalStyles.title}>Post your Service</Text>
+          <Text style={addStyles.title}>Post your Service</Text>
         </View>
       </View>
-      <View style={globalStyles.form}>
-        <View style={globalStyles.formGroup}>
-          <View style={globalStyles.field}>
+      <View style={addStyles.form}>
+        <View style={addStyles.formGroup}>
+          <View style={addStyles.field}>
             {(titleFocused || title.length > 0) && (
-              <Text style={globalStyles.floatingLabel}>Title</Text>
+              <Text style={addStyles.floatingLabel}>Title</Text>
             )}
             <TextInput
               value={title}
@@ -144,12 +140,12 @@ export default function AddPage() {
               onBlur={() => setTitleFocused(false)}
               placeholder={titleFocused ? "" : "Title"}
               placeholderTextColor={colors.textSecondary}
-              style={globalStyles.textInput}
+              style={addStyles.textInput}
             />
           </View>
-          <View style={globalStyles.field}>
+          <View style={addStyles.field}>
             {category !== "" && (
-              <Text style={globalStyles.floatingLabel}>Category</Text>
+              <Text style={addStyles.floatingLabel}>Category</Text>
             )}
             <Picker
               selectedValue={category}
@@ -164,9 +160,9 @@ export default function AddPage() {
               ))}
             </Picker>
           </View>
-          <View style={globalStyles.field}>
+          <View style={addStyles.field}>
             {(descFocused || desc.length > 0) && (
-              <Text style={globalStyles.floatingLabel}>Description</Text>
+              <Text style={addStyles.floatingLabel}>Description</Text>
             )}
 
             <TextInput
@@ -176,27 +172,21 @@ export default function AddPage() {
               onBlur={() => setDescFocused(false)}
               placeholder={descFocused ? "" : "Description"}
               placeholderTextColor={colors.textSecondary}
-              style={globalStyles.textArea}
+              style={addStyles.textArea}
               multiline
               numberOfLines={5}
               textAlignVertical="top"
             />
           </View>
 
-          <View style={globalStyles.field}>
+          <View style={addStyles.field}>
             {image && (
-              <Text style={globalStyles.floatingLabel}>Service Image</Text>
+              <Text style={addStyles.floatingLabel}>Service Image</Text>
             )}
 
-            <TouchableOpacity
-              style={globalStyles.imageField}
-              onPress={pickImage}
-            >
+            <TouchableOpacity style={addStyles.imageField} onPress={pickImage}>
               {image ? (
-                <Image
-                  source={{ uri: image }}
-                  style={globalStyles.previewImage}
-                />
+                <Image source={{ uri: image }} style={addStyles.previewImage} />
               ) : (
                 <>
                   <Ionicons
@@ -205,20 +195,18 @@ export default function AddPage() {
                     color={colors.textSecondary}
                   />
 
-                  <Text style={globalStyles.imageTitle}>
-                    Tap to upload image
-                  </Text>
+                  <Text style={addStyles.imageTitle}>Tap to upload image</Text>
 
-                  <Text style={globalStyles.imageSubtitle}>
+                  <Text style={addStyles.imageSubtitle}>
                     JPG • PNG • Max 5 MB
                   </Text>
                 </>
               )}
             </TouchableOpacity>
           </View>
-          <View style={globalStyles.field}>
+          <View style={addStyles.field}>
             {priceType !== "" && (
-              <Text style={globalStyles.floatingLabel}>Price Type</Text>
+              <Text style={addStyles.floatingLabel}>Price Type</Text>
             )}
             <Picker
               selectedValue={priceType}
@@ -232,9 +220,9 @@ export default function AddPage() {
               <Picker.Item label="Request Quote" value="quote" />
             </Picker>
           </View>
-          <View style={globalStyles.field}>
+          <View style={addStyles.field}>
             {(titleFocused || title.length > 0) && (
-              <Text style={globalStyles.floatingLabel}>Starting Price</Text>
+              <Text style={addStyles.floatingLabel}>Starting Price</Text>
             )}
             <TextInput
               value={startingPrice}
@@ -243,16 +231,16 @@ export default function AddPage() {
               onBlur={() => setTitleFocused(false)}
               placeholder={titleFocused ? "" : "Starting Price"}
               placeholderTextColor={colors.textSecondary}
-              style={globalStyles.textInput}
+              style={addStyles.textInput}
             />
           </View>
           <View>
             <TouchableOpacity
-              style={globalStyles.postButton}
+              style={addStyles.postButton}
               onPress={handlePost}
               disabled={isPending}
             >
-              <Text style={globalStyles.postButtonText}>
+              <Text style={addStyles.postButtonText}>
                 {isPending ? "Posting..." : "Post Service"}
               </Text>
             </TouchableOpacity>
