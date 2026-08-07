@@ -3,11 +3,11 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Image,
   FlatList,
   ActivityIndicator,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+
 import { useRouter } from "expo-router";
 
 import { addStyles } from "@/styles/add";
@@ -85,9 +85,6 @@ export default function CategoriesPage() {
               width: "31%",
               alignItems: "center",
             }}
-            // onPress={() => {
-            //   router.push(`/category/${item.id}`);
-            // }}
             onPress={() => {
               router.push({
                 pathname: "/category/[id]",
@@ -97,12 +94,20 @@ export default function CategoriesPage() {
           >
             {/* CIRCLE ICON */}
             <View style={Styles.icon}>
-              <Image
-                source={{
-                  uri: item.icon,
-                }}
-                style={Styles.image}
-                resizeMode="contain"
+              {/* <MaterialIcons
+                name={item.icon as keyof typeof MaterialIcons.glyphMap}
+                size={30}
+                color={colors.primary}
+              /> */}
+              <MaterialIcons
+                name={
+                  item.icon.replace(
+                    /_/g,
+                    "-",
+                  ) as keyof typeof MaterialIcons.glyphMap
+                }
+                size={30}
+                color={colors.primary}
               />
             </View>
 

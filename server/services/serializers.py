@@ -4,16 +4,14 @@ from .models import Service, ServiceCategory
 
 class ServiceSerializer(serializers.ModelSerializer):
 
-    category = serializers.PrimaryKeyRelatedField(
-        queryset=ServiceCategory.objects.all(),
-    )
-
     category_name = serializers.CharField(
         source="category.name",
         read_only=True,
     )
 
-    image = serializers.SerializerMethodField()
+    image_url = serializers.SerializerMethodField(
+        read_only=True,
+    )
 
     class Meta:
         model = Service
@@ -25,6 +23,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             "name",
             "slug",
             "image",
+            "image_url",
             "description",
             "price_type",
             "starting_price",
@@ -33,7 +32,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             "created_at",
         ]
 
-    def get_image(self, obj):
+    def get_image_url(self, obj):
         if not obj.image:
             return None
 
@@ -41,7 +40,6 @@ class ServiceSerializer(serializers.ModelSerializer):
             return obj.image.url
         except Exception:
             return str(obj.image)
-
 
 class ServiceCategorySerializer(serializers.ModelSerializer):
 

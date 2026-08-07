@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -160,18 +160,19 @@ export const HomeHeader = () => {
                     onPress={() => setActiveCategory(item.id)}
                     style={[
                       globalStyles.categorysContainer,
-
                       activeCategory === item.id && globalStyles.activeCategory,
                     ]}
                   >
                     <View style={globalStyles.buttonContainer}>
-                      <Image
-                        source={{ uri: item.icon }}
-                        style={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: 16,
-                        }}
+                      <MaterialIcons
+                        name={
+                          item.icon.replace(
+                            /_/g,
+                            "-",
+                          ) as keyof typeof MaterialIcons.glyphMap
+                        }
+                        size={30}
+                        color={colors.primary}
                       />
                     </View>
 
