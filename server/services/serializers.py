@@ -13,7 +13,7 @@ class ServiceSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
-    image = serializers.SerializerMethodField()
+    image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Service
@@ -25,6 +25,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             "name",
             "slug",
             "image",
+            "image_url",
             "description",
             "price_type",
             "starting_price",
@@ -33,13 +34,23 @@ class ServiceSerializer(serializers.ModelSerializer):
             "created_at",
         ]
 
-    def get_image(self, obj):
+        read_only_fields = [
+            "id",
+            "slug",
+            "category_name",
+            "image_url",
+            "created_at",
+        ]
+
+    def get_image_url(self, obj):
         if not obj.image:
             return None
+
         try:
             return obj.image.url
         except Exception:
             return None
+
 
 class ServiceCategorySerializer(serializers.ModelSerializer):
 
@@ -58,6 +69,13 @@ class ServiceCategorySerializer(serializers.ModelSerializer):
             "icon",
             "description",
             "is_active",
+            "created_at",
+            "services",
+        ]
+
+        read_only_fields = [
+            "id",
+            "slug",
             "created_at",
             "services",
         ]
