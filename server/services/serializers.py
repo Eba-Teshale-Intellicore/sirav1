@@ -33,7 +33,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             "created_at",
         ]
 
-    def get_image_url(self, obj):
+    def get_image(self, obj):
         if not obj.image:
             return None
         try:
