@@ -34,7 +34,7 @@ class ServiceCategory(BaseModel):
         super().save(*args, **kwargs)
 
     class Meta:
-        ordering = ["name"]
+        ordering = ["created_at"]
 
     def __str__(self):
         return self.name
