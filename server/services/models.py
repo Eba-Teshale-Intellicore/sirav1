@@ -53,7 +53,6 @@ class Service(BaseModel):
 )
     name = models.CharField(max_length=100, db_index=True)
     slug = models.SlugField(unique=True,db_index=True, blank=True)
-    # image = models.ImageField(upload_to="services/", blank=True, null=True)
     image = CloudinaryField(
         "image",
         blank=True,
@@ -82,7 +81,7 @@ class Service(BaseModel):
         super().save(*args,**kwargs)
 
     class Meta:
-        ordering = ["name"]
+        ordering = ["created_at"]
 
     def __str__(self):
         return self.name

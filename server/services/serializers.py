@@ -13,7 +13,7 @@ class ServiceSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
-    image_url = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = Service
@@ -24,8 +24,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             "category_name",
             "name",
             "slug",
-            # "image",
-            "image_url",
+            "image",
             "description",
             "price_type",
             "starting_price",
@@ -37,7 +36,6 @@ class ServiceSerializer(serializers.ModelSerializer):
     def get_image_url(self, obj):
         if not obj.image:
             return None
-
         try:
             return obj.image.url
         except Exception:
