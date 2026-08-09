@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "mobile_app",
+    "name": "sirav1",
     "slug": "mobile_app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -27,9 +27,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      [
-        "@react-native-google-signin/google-signin"
-      ],
+      ["@react-native-google-signin/google-signin"],
       "expo-router",
       [
         "expo-splash-screen",
