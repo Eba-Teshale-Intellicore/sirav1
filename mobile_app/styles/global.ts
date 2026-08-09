@@ -195,14 +195,37 @@ export const globalStyles = StyleSheet.create({
 
   serviceImage: {
     width: "100%",
-    height: 180,
+    height: 200,
+  },
+  serviceImage2: {
+    width: "100%",
+    height: 400,
   },
 
   favoriteButton: {
     position: "absolute",
     top: 10,
     right: 10,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: colors.surface,
+    borderRadius: 20,
+    padding: 8,
+  },
+  backButton: {
+    position: "absolute",
+    top: 10,
+    left: 10,
+    backgroundColor: colors.surface,
+    borderRadius: 20,
+    padding: 8,
+  },
+  favoriteButton2: {
+    backgroundColor: colors.surface,
+    borderRadius: 20,
+    padding: 8,
+  },
+
+  backButton2: {
+    backgroundColor: colors.surface,
     borderRadius: 20,
     padding: 8,
   },

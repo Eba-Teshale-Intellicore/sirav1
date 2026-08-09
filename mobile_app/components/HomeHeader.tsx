@@ -196,9 +196,17 @@ export const HomeHeader = () => {
           </>
         }
         renderItem={({ item }) => (
-          <View style={globalStyles.serviceCard}>
+          <TouchableOpacity
+            style={globalStyles.serviceCard}
+            onPress={() => {
+              router.push({
+                pathname: "/service/[id]",
+                params: { id: String(item.id) },
+              });
+            }}
+          >
             <Image
-              source={{ uri: item.image }}
+              source={{ uri: item.image_url }}
               style={globalStyles.serviceImage}
             />
 
@@ -226,7 +234,7 @@ export const HomeHeader = () => {
                 />
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
         )}
         ListEmptyComponent={
           <Text

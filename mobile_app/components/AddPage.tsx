@@ -93,14 +93,14 @@ export default function AddPage() {
         router.back();
       },
 
-      // onError: (error) => {
-      //   console.log(error);
-      //   alert("Failed to post service.");
-      // },
-      onError: (error: any) => {
-        console.log(error.response?.data);
-        console.log(error.response?.status);
+      onError: (error) => {
+        console.log(error);
+        alert("Failed to post service.");
       },
+      // onError: (error: any) => {
+      //   console.log(error.response?.data);
+      //   console.log(error.response?.status);
+      // },
     });
   };
 

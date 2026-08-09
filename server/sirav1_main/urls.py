@@ -20,19 +20,30 @@ from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
 
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/v1/', include("services.urls")),
+    path("admin/", admin.site.urls),
+
+    # Services
+    path("api/v1/", include("services.urls")),
+
+    # Providers
     path("api/v1/providers/", include("providers.urls")),
+
+    # Accounts
     path("accounts/", include("accounts.urls")),
+
+    # Bookings
     path("api/v1/", include("bookings.urls")),
-    path("api/v1/", include("notifications.urls"))
+
+    # Notifications
+    path("api/v1/", include("notifications.urls")),
+
+    # Authentication
+    path("api/v1/auth/", include("accounts.auth_urls")),
 ]
 
-# urlpatterns += static(
-#     settings.MEDIA_URL,
-#     document_root=settings.MEDIA_ROOT
-# )
+
 if settings.DEBUG:
     urlpatterns += static(
         settings.MEDIA_URL,

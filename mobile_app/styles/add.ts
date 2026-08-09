@@ -80,11 +80,11 @@ export const addStyles = StyleSheet.create({
     fontWeight: "600",
   },
   textInput: {
-    flex: 1,
     color: colors.text,
     fontSize: 16,
     height: 52,
   },
+
   textArea: {
     minHeight: 120,
     color: colors.text,

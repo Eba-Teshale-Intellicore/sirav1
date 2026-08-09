@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .models.verification import ProviderVerification
 
@@ -16,18 +16,23 @@ from .serializers import ProviderAvailabilitySerializer, ProviderPortfolioSerial
 
 class ProviderProfileViewSet(ModelViewSet):
 
-  queryset = (
-    ProviderProfile.objects
-    .filter(is_available=True)
-    .prefetch_related(
-        "skills",
-        "portfolios",
-        "availability",
-    )
-    .select_related("verification")
-)
-  serializer_class = ProviderProfileSerializer
-  permission_classes = [AllowAny]
+    serializer_class = ProviderProfileSerializer
+    permission_classes = [IsAuthenticated,]
+    def get_queryset(self):
+        return (
+            ProviderProfile.objects
+            .filter(user=self.request.user)
+            .select_related("user")
+            .prefetch_related(
+                "skills",
+                "portfolios",
+                "availability",
+            )
+        )
+    def perform_create(self, serializer):
+        serializer.save(
+            user=self.request.user
+        )
 
 class ProviderSkillViewSet(ModelViewSet):
 

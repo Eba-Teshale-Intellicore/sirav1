@@ -17,6 +17,7 @@ interface Service {
   name: string;
   slug: string;
   image: string;
+  image_url: string;
   description: string;
   price_type: string;
   starting_price: string;

@@ -1,17 +1,21 @@
 from django.shortcuts import render
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from accounts.serializers import CustomerProfileSerializer, UserSerializer
 from .models.user import User
 from .models.customer import CustomerProfile
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 # Create your views here.
 
 
-class UserViewSet(ModelViewSet):
-  queryset = User.objects.all()
-  serializer_class = UserSerializer
-  permission_classes = [AllowAny]
+class UserViewSet(ReadOnlyModelViewSet):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return User.objects.filter(
+            id=self.request.user.id
+        )
 
 
 class CustomerProfileViewSet(ModelViewSet):

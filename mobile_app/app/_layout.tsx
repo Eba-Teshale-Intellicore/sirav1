@@ -22,6 +22,10 @@ export default function RootLayout() {
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          {/* <Stack.Screen
+            name="(tabs)/profile.tsx"
+            options={{ headerShown: false }}
+          /> */}
           <Stack.Screen
             name="categories"
             options={{
@@ -33,7 +37,12 @@ export default function RootLayout() {
             name="category/[id]"
             options={{ headerShown: false, title: "detail Categories" }}
           />
+
           <Stack.Screen name="services" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="service/[id]"
+            options={{ title: "detail Service", headerShown: false }}
+          />
           <Stack.Screen
             name="modal"
             options={{ presentation: "modal", title: "Modal" }}

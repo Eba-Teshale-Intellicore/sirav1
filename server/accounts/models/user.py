@@ -10,13 +10,17 @@ class User(BaseModel, AbstractUser):
         ("provider", "Provider"),
         ("admin", "Admin"),
     )
+  AUTH_PROVIDER_CHOICES = (
+        ("google", "Google"),
+    )
   username = None
   first_name = None
   last_name = None
   email = models.EmailField(unique=True) 
   full_name = models.CharField(max_length=100)
   avatar = models.URLField(blank=True, null=True)
-  auth_provider = models.CharField(max_length=10, default="google")
+  google_sub = models.CharField(max_length=255,unique=True,null=True,blank=True,db_index=True,)
+  auth_provider = models.CharField(max_length=20,choices=AUTH_PROVIDER_CHOICES,default="google",)
   role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="customer" )
 
   USERNAME_FIELD = "email"
@@ -24,7 +28,7 @@ class User(BaseModel, AbstractUser):
   objects = UserManager()
 
   class Meta:
-    ordering = ["full_name"]
+    ordering = ["created_at"]
 
   def __str__(self):
     return self.email

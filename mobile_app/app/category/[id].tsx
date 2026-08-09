@@ -106,10 +106,18 @@ export default function CategoriesDetailPage() {
           paddingBottom: 30,
         }}
         renderItem={({ item }) => (
-          <View style={globalStyles.serviceCard}>
+          <TouchableOpacity
+            style={globalStyles.serviceCard}
+            onPress={() => {
+              router.push({
+                pathname: "/service/[id]",
+                params: { id: String(item.id) },
+              });
+            }}
+          >
             {/* SERVICE IMAGE */}
             <Image
-              source={{ uri: item.image }}
+              source={{ uri: item.image_url }}
               style={globalStyles.serviceImage}
             />
 
@@ -132,7 +140,7 @@ export default function CategoriesDetailPage() {
                 color={colors.primary}
               />
             </View>
-          </View>
+          </TouchableOpacity>
         )}
         ListEmptyComponent={
           <Text

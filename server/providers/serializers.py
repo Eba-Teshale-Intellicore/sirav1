@@ -76,6 +76,12 @@ class ProviderVerificationSerializer(serializers.ModelSerializer):
     ]
 
 class ProviderProfileSerializer(serializers.ModelSerializer):
+    # user = UserSerializer(read_only=True)
+
+    profile_image = serializers.ImageField(
+        required=False,
+        allow_null=True,
+    )
     skills = ProviderSkillSerializer(many=True, read_only=True)
     portfolios = ProviderPortfolioSerializer(many=True, read_only=True)
     availability = ProviderAvailabilitySerializer(many=True, read_only=True)
@@ -98,7 +104,21 @@ class ProviderProfileSerializer(serializers.ModelSerializer):
             "is_available",
             "completed_jobs",
             "average_rating",
-            "language",
+            "languages",
+            "skills",
+            "portfolios",
+            "availability",
+            "verification",
+            "created_at",
+        ]
+        read_only_fields = [
+            "id",
+            "user",
+            "latitude",
+            "longitude",
+            "is_verified",
+            "completed_jobs",
+            "average_rating",
             "skills",
             "portfolios",
             "availability",
