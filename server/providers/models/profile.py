@@ -6,11 +6,18 @@ from accounts.models import User
 
 class ProviderProfile(BaseModel):
 
+    # user = models.OneToOneField(
+    #     User,
+    #     related_name="provider_profile",
+    #     on_delete=models.CASCADE,
+    # )
     user = models.OneToOneField(
-        User,
-        related_name="provider_profile",
-        on_delete=models.CASCADE,
-    )
+            User,
+            related_name="provider_profile",
+            on_delete=models.CASCADE,
+            null=True,
+            blank=True,
+        )
 
     # User-editable
     profile_image = CloudinaryField(
