@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import { Alert, Text, View, Pressable, ActivityIndicator } from "react-native";
 import * as WebBrowser from "expo-web-browser";
+
 import { colors } from "@/styles/global";
+import { saveTokens } from "@/services/authStorage";
 
 const GOOGLE_LOGIN_URL =
   "https://sirav1-1.onrender.com/api/v1/auth/google/start/";
+
+const REDIRECT_URI = "mobileapp://auth/callback";
 
 export default function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
@@ -15,7 +19,7 @@ export default function LoginPage() {
 
       const result = await WebBrowser.openAuthSessionAsync(
         GOOGLE_LOGIN_URL,
-        "mobileapp://auth/callback",
+        REDIRECT_URI,
       );
 
       console.log("GOOGLE AUTH RESULT:", result);
@@ -23,19 +27,39 @@ export default function LoginPage() {
       if (result.type === "success") {
         console.log("AUTH CALLBACK URL:", result.url);
 
-        // We will extract the Django tokens here
-        // after the Django callback is ready.
+        const url = new URL(result.url);
+
+        const accessToken = url.searchParams.get("access_token");
+        const refreshToken = url.searchParams.get("refresh_token");
+
+        if (!accessToken || !refreshToken) {
+          Alert.alert(
+            "Login Error",
+            "Sira did not receive authentication tokens.",
+          );
+          return;
+        }
+
+        await saveTokens(accessToken, refreshToken);
+
+        Alert.alert("Success", "Welcome to Sira!");
+
+        console.log("SIRA LOGIN SUCCESS");
       }
 
       if (result.type === "cancel") {
         console.log("GOOGLE LOGIN CANCELLED");
+      }
+
+      if (result.type === "dismiss") {
+        console.log("GOOGLE LOGIN DISMISSED");
       }
     } catch (error) {
       console.error("GOOGLE LOGIN ERROR:", error);
 
       Alert.alert(
         "Google Sign-In Failed",
-        "Unable to start Google authentication.",
+        "Unable to complete Google authentication.",
       );
     } finally {
       setSubmitting(false);

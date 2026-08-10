@@ -18,7 +18,8 @@ from .services.google_oauth import (
     exchange_code_for_tokens,
     verify_google_id_token,
 )
-
+from django.http import HttpResponse
+from urllib.parse import urlencode
 
 User = get_user_model()
 
@@ -172,6 +173,30 @@ class GoogleCallbackView(APIView):
             f"&refresh_token={refresh_token}"
         )
 
-        return HttpResponseRedirect(
-            redirect_url
+        # return HttpResponseRedirect(
+        #     redirect_url
+        # )
+        query = urlencode({
+        "access_token": access_token,
+        "refresh_token": refresh_token,})
+
+        redirect_url = f"{settings.EXPO_REDIRECT_URI}?{query}"
+
+        return HttpResponse(
+            f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <title>Sira Login</title>
+            </head>
+            <body>
+                <p>Completing Sira login...</p>
+
+                <script>
+                    window.location.href = {redirect_url!r};
+                </script>
+            </body>
+            </html>
+            """
         )
