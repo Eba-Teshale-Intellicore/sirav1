@@ -1,56 +1,72 @@
 import React, { useEffect, useState } from "react";
-import { View, Alert } from "react-native";
+import { View, Alert, Text, Pressable } from "react-native";
+import * as WebBrowser from "expo-web-browser";
+import * as Google from "expo-auth-session/providers/google";
+import { makeRedirectUri } from "expo-auth-session";
 
-import {
-  GoogleSignin,
-  GoogleSigninButton,
-  isSuccessResponse,
-} from "@react-native-google-signin/google-signin";
 import { googleLogin } from "@/services/auth";
 import { colors } from "@/styles/global";
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
 
+  const redirectUri = makeRedirectUri({
+    scheme: "mobileapp",
+  });
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
+
+    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+
+    redirectUri,
+
+    scopes: ["openid", "profile", "email"],
+  });
+
   useEffect(() => {
-    GoogleSignin.configure({
-      webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-      profileImageSize: 150,
-    });
-  }, []);
+    if (response?.type === "success") {
+      handleGoogleResponse(response.authentication?.idToken);
+    }
+  }, [response]);
+
+  const handleGoogleResponse = async (idToken?: string) => {
+    if (!idToken) {
+      Alert.alert("Login Error", "Google did not return an ID token.");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      console.log("GOOGLE ID TOKEN:", idToken);
+
+      const data = await googleLogin(idToken);
+
+      console.log("DJANGO LOGIN:", data);
+
+      Alert.alert("Success", "Welcome to Sira!");
+    } catch (error) {
+      console.error("DJANGO GOOGLE LOGIN ERROR:", error);
+
+      Alert.alert("Login Failed", "Unable to authenticate with Sira.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const handleGoogleSignIn = async () => {
     try {
       setSubmitting(true);
 
-      await GoogleSignin.hasPlayServices({
-        showPlayServicesUpdateDialog: true,
-      });
-
-      const response = await GoogleSignin.signIn();
-
-      if (!isSuccessResponse(response)) {
-        return;
-      }
-
-      const { idToken, user } = response.data;
-
-      console.log("GOOGLE USER:", user);
-
-      if (!idToken) {
-        Alert.alert("Login Error", "Google did not return an ID token.");
-        return;
-      }
-
-      // Send Google token to Django
-      const data = await googleLogin(idToken);
-
-      console.log("DJANGO LOGIN:", data);
+      await promptAsync();
     } catch (error) {
       console.error("GOOGLE LOGIN ERROR:", error);
 
       Alert.alert("Google Sign-In Failed", "Unable to sign in with Google.");
-    } finally {
+
       setSubmitting(false);
     }
   };
@@ -58,21 +74,45 @@ export default function LoginPage() {
   return (
     <View
       style={{
-        position: "absolute",
-        bottom: 20,
-        height: 100,
-        width: "100%",
-        paddingVertical: 30,
-        backgroundColor: colors.surface,
+        flex: 1,
+        backgroundColor: colors.primary,
+        justifyContent: "center",
         alignItems: "center",
+        paddingHorizontal: 20,
       }}
     >
-      <GoogleSigninButton
-        size={GoogleSigninButton.Size.Wide}
-        color={GoogleSigninButton.Color.Dark}
+      <Text
+        style={{
+          color: colors.text,
+          fontSize: 28,
+          fontWeight: "700",
+          marginBottom: 30,
+        }}
+      >
+        Sign in to Sira
+      </Text>
+
+      <Pressable
         onPress={handleGoogleSignIn}
-        disabled={submitting}
-      />
+        disabled={!request || submitting}
+        style={{
+          backgroundColor: "#ffffff",
+          paddingVertical: 14,
+          paddingHorizontal: 40,
+          borderRadius: 8,
+          opacity: !request || submitting ? 0.6 : 1,
+        }}
+      >
+        <Text
+          style={{
+            color: "#000000",
+            fontSize: 16,
+            fontWeight: "600",
+          }}
+        >
+          {submitting ? "Signing in..." : "Continue with Google"}
+        </Text>
+      </Pressable>
     </View>
   );
 }
