@@ -1,7 +1,9 @@
+import React from "react";
+import { ActivityIndicator, View } from "react-native";
+
 import AddPage from "@/components/AddPage";
 import LoginPage from "@/components/LoginPage";
 import { useAuth } from "@/hooks/useAuth";
-import { ActivityIndicator, View } from "react-native";
 import { colors } from "@/styles/global";
 
 export default function Add() {
@@ -17,7 +19,7 @@ export default function Add() {
           alignItems: "center",
         }}
       >
-        <ActivityIndicator color={colors.primary} />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
