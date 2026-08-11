@@ -14,8 +14,11 @@ class User(BaseModel, AbstractUser):
         ("google", "Google"),
     )
   username = None
-  first_name = None
-  last_name = None
+  # first_name = None
+  # last_name = None
+
+  first_name = models.CharField(max_length=50,blank=True,)
+  last_name = models.CharField(max_length=50,blank=True,)
   email = models.EmailField(unique=True) 
   full_name = models.CharField(max_length=100)
   avatar = models.URLField(blank=True, null=True)

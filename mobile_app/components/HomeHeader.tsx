@@ -53,21 +53,21 @@ export const HomeHeader = () => {
     }
   };
 
-  if (categoriesLoading || servicesLoading) {
-    return (
-      <View style={globalStyles.container}>
-        <Text style={{ color: colors.text }}>Loading...</Text>
-      </View>
-    );
-  }
+  // if (categoriesLoading || servicesLoading) {
+  //   return (
+  //     <View style={globalStyles.container}>
+  //       <Text style={{ color: colors.text }}>Loading...</Text>
+  //     </View>
+  //   );
+  // }
 
-  if (error) {
-    return (
-      <View style={globalStyles.container}>
-        <Text style={{ color: "red" }}>Failed to load services.</Text>
-      </View>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <View style={globalStyles.container}>
+  //       <Text style={{ color: "red" }}>Failed to load services.</Text>
+  //     </View>
+  //   );
+  // }
 
   return (
     <View style={{ flex: 1 }}>
