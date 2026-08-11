@@ -14,9 +14,11 @@ import {
 import { colors, globalStyles } from "@/styles/global";
 import { useRouter } from "expo-router";
 import { useCategories, useServices } from "@/hooks/useCategories";
+import { useAuth } from "@/context/AuthContext";
 
 export const HomeHeader = () => {
   const router = useRouter();
+  const { logout } = useAuth();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [showStickySearch, setShowStickySearch] = useState(false);
 
@@ -110,6 +112,26 @@ export const HomeHeader = () => {
               <View style={globalStyles.homeHeader}>
                 <View>
                   <Text style={globalStyles.location}>Location</Text>
+                  <TouchableOpacity
+                    onPress={logout}
+                    style={{
+                      marginTop: 10,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      backgroundColor: "#ffffff",
+                      borderRadius: 8,
+                      alignSelf: "flex-start",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "#000000",
+                        fontWeight: "600",
+                      }}
+                    >
+                      Logout
+                    </Text>
+                  </TouchableOpacity>
 
                   <View style={globalStyles.direction}>
                     <Ionicons
