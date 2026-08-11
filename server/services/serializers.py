@@ -3,6 +3,27 @@ from .models import Service, ServiceCategory
 
 
 class ServiceSerializer(serializers.ModelSerializer):
+    provider_name = serializers.CharField(
+        source="provider.user.full_name",
+        read_only=True,
+    )
+
+    provider_phone = serializers.CharField(
+        source="provider.phone",
+        read_only=True,
+    )
+
+    provider_city = serializers.CharField(
+        source="provider.city",
+        read_only=True,
+    )
+
+    provider_rating = serializers.DecimalField(
+        source="provider.average_rating",
+        max_digits=3,
+        decimal_places=2,
+        read_only=True,
+    )
 
     category = serializers.PrimaryKeyRelatedField(
         queryset=ServiceCategory.objects.all(),
@@ -20,6 +41,11 @@ class ServiceSerializer(serializers.ModelSerializer):
 
         fields = [
             "id",
+            "provider",
+            "provider_name",
+            "provider_phone",
+            "provider_city",
+            "provider_rating",
             "category",
             "category_name",
             "name",
@@ -36,7 +62,12 @@ class ServiceSerializer(serializers.ModelSerializer):
 
         read_only_fields = [
             "id",
+            "provider",
             "slug",
+            "provider_name",
+            "provider_phone",
+            "provider_city",
+            "provider_rating",
             "category_name",
             "image_url",
             "created_at",

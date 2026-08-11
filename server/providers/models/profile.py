@@ -1,25 +1,23 @@
 from django.db import models
+
 from common.models import BaseModel
 from cloudinary.models import CloudinaryField
 from accounts.models import User
 
 
+
 class ProviderProfile(BaseModel):
 
-    # user = models.OneToOneField(
-    #     User,
-    #     related_name="provider_profile",
-    #     on_delete=models.CASCADE,
-    # )
     user = models.OneToOneField(
-            User,
-            related_name="provider_profile",
-            on_delete=models.CASCADE,
-            null=True,
-            blank=True,
-        )
+        User,
+        related_name="provider_profile",
+        on_delete=models.CASCADE,
+    )
 
-    # User-editable
+    # -------------------------
+    # Provider information
+    # -------------------------
+
     profile_image = CloudinaryField(
         "profile_image",
         blank=True,
@@ -58,7 +56,10 @@ class ProviderProfile(BaseModel):
         help_text="Example: Afaan Oromo, Amharic, English",
     )
 
-    # Automatically handled by the system
+    # -------------------------
+    # Location
+    # -------------------------
+
     latitude = models.DecimalField(
         max_digits=9,
         decimal_places=6,
@@ -73,12 +74,26 @@ class ProviderProfile(BaseModel):
         null=True,
     )
 
+    # -------------------------
     # System-managed
-    is_verified = models.BooleanField(default=False)
-    is_available = models.BooleanField(default=True)
-    completed_jobs = models.PositiveIntegerField(default=0)
+    # -------------------------
 
+    is_verified = models.BooleanField(
+        default=False,
+    )
+
+    is_available = models.BooleanField(
+        default=True,
+    )
+
+    completed_jobs = models.PositiveIntegerField(
+        default=0,
+    )
+
+    # -------------------------
     # Calculated from reviews
+    # -------------------------
+
     average_rating = models.DecimalField(
         max_digits=3,
         decimal_places=2,
@@ -86,4 +101,4 @@ class ProviderProfile(BaseModel):
     )
 
     def __str__(self):
-        return f"{self.user.get_full_name()} - {self.city}"
+        return f"{self.user.full_name} - {self.city}"

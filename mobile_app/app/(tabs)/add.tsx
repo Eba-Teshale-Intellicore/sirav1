@@ -1,5 +1,4 @@
 import React from "react";
-
 import { ActivityIndicator, View } from "react-native";
 
 import AddPage from "@/components/AddPage";
@@ -11,6 +10,11 @@ import { colors } from "@/styles/global";
 
 export default function Add() {
   const { isAuthenticated, isLoading } = useAuth();
+
+  console.log("ADD TAB:", {
+    isAuthenticated,
+    isLoading,
+  });
 
   if (isLoading) {
     return (
@@ -28,8 +32,12 @@ export default function Add() {
   }
 
   if (!isAuthenticated) {
+    console.log("ADD TAB → LOGIN PAGE");
+
     return <LoginPage />;
   }
+
+  console.log("ADD TAB → ADD PAGE");
 
   return <AddPage />;
 }
