@@ -1,9 +1,12 @@
 import React from "react";
+
 import { ActivityIndicator, View } from "react-native";
 
 import AddPage from "@/components/AddPage";
 import LoginPage from "@/components/LoginPage";
-import { useAuth } from "@/hooks/useAuth";
+
+import { useAuth } from "@/context/AuthContext";
+
 import { colors } from "@/styles/global";
 
 export default function Add() {

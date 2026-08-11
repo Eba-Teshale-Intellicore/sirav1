@@ -5,39 +5,49 @@ import { getAccessToken, clearTokens } from "@/services/authStorage";
 type AuthContextType = {
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: () => void;
+  login: () => Promise<void>;
   logout: () => Promise<void>;
+  refreshAuth: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    checkAuthentication();
-  }, []);
-
-  async function checkAuthentication() {
+  async function refreshAuth() {
     try {
-      const token = await getAccessToken();
+      const accessToken = await getAccessToken();
 
-      setIsAuthenticated(!!token);
+      setIsAuthenticated(Boolean(accessToken));
     } catch (error) {
       console.error("AUTH CHECK ERROR:", error);
+
       setIsAuthenticated(false);
-    } finally {
-      setIsLoading(false);
     }
   }
 
-  function login() {
-    setIsAuthenticated(true);
+  useEffect(() => {
+    async function initializeAuth() {
+      try {
+        await refreshAuth();
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    initializeAuth();
+  }, []);
+
+  async function login() {
+    await refreshAuth();
   }
 
   async function logout() {
     await clearTokens();
+
     setIsAuthenticated(false);
   }
 
@@ -48,6 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         login,
         logout,
+        refreshAuth,
       }}
     >
       {children}

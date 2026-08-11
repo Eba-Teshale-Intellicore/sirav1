@@ -1,9 +1,14 @@
 import React, { useState } from "react";
+
 import { Alert, Text, View, Pressable, ActivityIndicator } from "react-native";
+
 import * as WebBrowser from "expo-web-browser";
 
 import { colors } from "@/styles/global";
+
 import { saveTokens } from "@/services/authStorage";
+
+import { useAuth } from "@/context/AuthContext";
 
 const GOOGLE_LOGIN_URL =
   "https://sirav1-1.onrender.com/api/v1/auth/google/start/";
@@ -12,6 +17,8 @@ const REDIRECT_URI = "mobileapp://auth/callback";
 
 export default function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
+
+  const { login } = useAuth();
 
   const handleGoogleSignIn = async () => {
     try {
@@ -30,6 +37,7 @@ export default function LoginPage() {
         const url = new URL(result.url);
 
         const accessToken = url.searchParams.get("access_token");
+
         const refreshToken = url.searchParams.get("refresh_token");
 
         if (!accessToken || !refreshToken) {
@@ -37,14 +45,31 @@ export default function LoginPage() {
             "Login Error",
             "Sira did not receive authentication tokens.",
           );
+
           return;
         }
 
+        /*
+         * 1. Save JWT tokens
+         */
         await saveTokens(accessToken, refreshToken);
 
-        Alert.alert("Success", "Welcome to Sira!");
+        /*
+         * 2. Tell AuthContext that
+         *    authentication succeeded.
+         */
+        await login();
 
         console.log("SIRA LOGIN SUCCESS");
+
+        /*
+         * Do NOT navigate manually.
+         *
+         * Add.tsx is already watching
+         * isAuthenticated.
+         */
+
+        Alert.alert("Success", "Welcome to Sira!");
       }
 
       if (result.type === "cancel") {

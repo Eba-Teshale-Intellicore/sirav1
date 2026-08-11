@@ -9,3 +9,20 @@ export default function profile() {
     </View>
   );
 }
+
+// export default function Profile() {
+//   const {
+//     isAuthenticated,
+//     isLoading,
+//   } = useAuth();
+
+//   if (isLoading) {
+//     return <ActivityIndicator />;
+//   }
+
+//   if (!isAuthenticated) {
+//     return <LoginPage />;
+//   }
+
+//   return <ProfilePage />;
+// }
