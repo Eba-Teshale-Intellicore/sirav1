@@ -31,6 +31,12 @@ export default function RootLayout() {
             options={{ headerShown: false }}
           /> */}
             <Stack.Screen
+              name="auth/callback"
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
               name="categories"
               options={{
                 headerShown: false,

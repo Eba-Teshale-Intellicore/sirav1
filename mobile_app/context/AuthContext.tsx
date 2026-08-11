@@ -21,6 +21,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const accessToken = await getAccessToken();
 
+      console.log("AUTH TOKEN EXISTS:", Boolean(accessToken));
+
       setIsAuthenticated(Boolean(accessToken));
     } catch (error) {
       console.error("AUTH CHECK ERROR:", error);
@@ -42,6 +44,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   async function login() {
+    console.log("AUTH LOGIN");
+
     await refreshAuth();
   }
 
