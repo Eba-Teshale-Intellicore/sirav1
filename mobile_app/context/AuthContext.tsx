@@ -44,8 +44,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   async function login() {
-    console.log("AUTH LOGIN");
-
     await refreshAuth();
   }
 

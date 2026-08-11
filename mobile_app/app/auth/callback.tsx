@@ -12,7 +12,7 @@ export default function AuthCallback() {
     refresh_token?: string;
   }>();
 
-  const { login } = useAuth();
+  const { refreshAuth } = useAuth();
 
   useEffect(() => {
     async function completeLogin() {
@@ -25,26 +25,36 @@ export default function AuthCallback() {
         if (!accessToken || !refreshToken) {
           console.error("Missing authentication tokens.");
 
-          router.replace("/(tabs)/index");
+          router.replace("/(tabs)/add");
+
           return;
         }
 
-        // 1. Save tokens
+        console.log("ACCESS TOKEN EXISTS:", Boolean(accessToken));
+        console.log("REFRESH TOKEN EXISTS:", Boolean(refreshToken));
+
+        /*
+         * Save JWT tokens.
+         */
         await saveTokens(accessToken, refreshToken);
 
         console.log("TOKENS SAVED");
 
-        // 2. Tell AuthContext
-        await login();
+        /*
+         * Tell AuthContext to check SecureStore again.
+         */
+        await refreshAuth();
 
-        console.log("AUTH CONTEXT UPDATED");
+        console.log("AUTH CONTEXT REFRESHED");
 
-        // 3. Go to Add page
+        /*
+         * Now go directly to Add.
+         */
         router.replace("/(tabs)/add");
       } catch (error) {
         console.error("AUTH CALLBACK ERROR:", error);
 
-        router.replace("/(tabs)/index");
+        router.replace("/(tabs)/add");
       }
     }
 
@@ -64,8 +74,8 @@ export default function AuthCallback() {
 
       <Text
         style={{
-          color: colors.text,
           marginTop: 20,
+          color: colors.text,
           fontSize: 16,
         }}
       >
