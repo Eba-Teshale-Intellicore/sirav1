@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from accounts.models.user import User
+
 from .models.verification import ProviderVerification
 
 from .models.portfolio import ProviderPortfolio
@@ -75,9 +77,23 @@ class ProviderVerificationSerializer(serializers.ModelSerializer):
       "created_at",
     ]
 
+class ProviderUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "first_name",
+            "last_name",
+            "full_name",
+            "email",
+            "avatar",
+            "role",
+        ]
+        read_only_fields = fields
+
 class ProviderProfileSerializer(serializers.ModelSerializer):
     # user = UserSerializer(read_only=True)
-
+    user = ProviderUserSerializer(read_only=True)
     profile_image = serializers.ImageField(
         required=False,
         allow_null=True,

@@ -2,9 +2,13 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 
 import { getAccessToken, clearTokens } from "@/services/authStorage";
 
+import { getMyUser, User } from "@/services/accounts";
+
 type AuthContextType = {
+  user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+
   login: () => Promise<void>;
   logout: () => Promise<void>;
   refreshAuth: () => Promise<void>;
@@ -13,9 +17,15 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const [isLoading, setIsLoading] = useState(true);
+
+  // =========================================================
+  // CHECK AUTH + LOAD USER
+  // =========================================================
 
   async function refreshAuth() {
     try {
@@ -23,13 +33,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       console.log("AUTH TOKEN EXISTS:", Boolean(accessToken));
 
-      setIsAuthenticated(Boolean(accessToken));
+      // No token
+      if (!accessToken) {
+        setUser(null);
+        setIsAuthenticated(false);
+        return;
+      }
+
+      // Token exists → ask Django who this user is
+      const currentUser = await getMyUser();
+
+      console.log("CURRENT USER:", currentUser);
+
+      setUser(currentUser);
+      setIsAuthenticated(true);
     } catch (error) {
       console.error("AUTH CHECK ERROR:", error);
 
+      // Token may be expired/invalid
+      setUser(null);
       setIsAuthenticated(false);
     }
   }
+
+  // =========================================================
+  // INITIAL AUTH CHECK
+  // =========================================================
 
   useEffect(() => {
     async function initializeAuth() {
@@ -43,21 +72,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initializeAuth();
   }, []);
 
+  // =========================================================
+  // LOGIN
+  // =========================================================
+
   async function login() {
     await refreshAuth();
   }
 
-  async function logout() {
-    await clearTokens();
+  // =========================================================
+  // LOGOUT
+  // =========================================================
 
-    setIsAuthenticated(false);
+  async function logout() {
+    try {
+      await clearTokens();
+
+      setUser(null);
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.error("LOGOUT ERROR:", error);
+    }
   }
 
   return (
     <AuthContext.Provider
       value={{
+        user,
         isAuthenticated,
         isLoading,
+
         login,
         logout,
         refreshAuth,
@@ -67,6 +111,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     </AuthContext.Provider>
   );
 }
+
+// =========================================================
+// HOOK
+// =========================================================
 
 export function useAuth() {
   const context = useContext(AuthContext);

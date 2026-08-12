@@ -42,6 +42,8 @@ class ProviderProfile(BaseModel):
     city = models.CharField(
         max_length=100,
         db_index=True,
+        blank=True,
+        null=True,
     )
 
     address = models.CharField(

@@ -24,6 +24,10 @@ class ServiceSerializer(serializers.ModelSerializer):
         decimal_places=2,
         read_only=True,
     )
+    provider_avatar = serializers.URLField(
+        source="provider.user.avatar",
+        read_only=True,
+    )
 
     category = serializers.PrimaryKeyRelatedField(
         queryset=ServiceCategory.objects.all(),
@@ -46,6 +50,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             "provider_phone",
             "provider_city",
             "provider_rating",
+            "provider_avatar",
             "category",
             "category_name",
             "name",

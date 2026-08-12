@@ -7,6 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
+from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -17,7 +18,7 @@ from .services.google_oauth import (
     exchange_code_for_tokens,
     verify_google_id_token,
 )
-
+from providers.models.profile import ProviderProfile
 User = get_user_model()
 
 class GoogleStartView(APIView):
@@ -64,10 +65,7 @@ class GoogleCallbackView(APIView):
         if error:
             return Response(
                 {
-                    "detail": (
-                        "Google authentication "
-                        "was cancelled or failed."
-                    ),
+                    "detail": "Google authentication was cancelled or failed.",
                     "error": error,
                 },
                 status=status.HTTP_400_BAD_REQUEST,
@@ -76,77 +74,61 @@ class GoogleCallbackView(APIView):
         if not code:
             return Response(
                 {
-                    "detail":
-                        "Authorization code is missing."
+                    "detail": "Authorization code is missing."
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # -------------------------------
-        # CHECK STATE
-        # -------------------------------
+        # -------------------------
+        # STATE
+        # -------------------------
 
         saved_state = request.session.get(
             "google_oauth_state"
         )
 
         if not saved_state or state != saved_state:
-
             return Response(
                 {
-                    "detail":
-                        "Invalid OAuth state."
+                    "detail": "Invalid OAuth state."
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        del request.session[
-            "google_oauth_state"
-        ]
+        del request.session["google_oauth_state"]
 
-        # -------------------------------
-        # GET EXPO REDIRECT URI
-        # -------------------------------
+        # -------------------------
+        # EXPO REDIRECT
+        # -------------------------
 
         expo_redirect_uri = request.session.get(
             "expo_redirect_uri"
         )
 
         if not expo_redirect_uri:
-
             return Response(
                 {
-                    "detail":
-                        "Expo redirect URI is missing."
+                    "detail": "Expo redirect URI is missing."
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        del request.session[
-            "expo_redirect_uri"
-        ]
+        del request.session["expo_redirect_uri"]
 
-        # -------------------------------
-        # GOOGLE TOKEN
-        # -------------------------------
+        # -------------------------
+        # GOOGLE
+        # -------------------------
 
         try:
 
-            token_data = exchange_code_for_tokens(
-                code
-            )
+            token_data = exchange_code_for_tokens(code)
 
-            google_id_token = token_data.get(
-                "id_token"
-            )
+            google_id_token = token_data.get("id_token")
 
             if not google_id_token:
-
                 return Response(
                     {
-                        "detail":
-                            "Google did not return "
-                            "an ID token."
+                        "detail": "Google did not return an ID token."
                     },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
@@ -159,67 +141,54 @@ class GoogleCallbackView(APIView):
 
             return Response(
                 {
-                    "detail":
-                        "Google authentication failed.",
+                    "detail": "Google authentication failed.",
                     "error": str(error),
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # -------------------------------
-        # GOOGLE USER
-        # -------------------------------
+        # -------------------------
+        # GOOGLE USER DATA
+        # -------------------------
 
-        google_sub = google_user.get(
-            "sub"
-        )
-
-        email = google_user.get(
-            "email"
-        )
-
-        full_name = google_user.get(
-            "name",
-            ""
-        )
-
-        avatar = google_user.get(
-            "picture"
-        )
+        google_sub = google_user.get("sub")
+        email = google_user.get("email")
+        first_name = google_user.get("given_name", "")
+        last_name = google_user.get("family_name", "")
+        full_name = google_user.get("name", "")
+        avatar = google_user.get("picture")
 
         if not google_sub or not email:
-
             return Response(
                 {
-                    "detail":
-                        "Google account information "
-                        "is incomplete."
+                    "detail": "Google account information is incomplete."
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # -------------------------------
+        # -------------------------
         # FIND USER
-        # -------------------------------
+        # -------------------------
 
         user = User.objects.filter(
             google_sub=google_sub
         ).first()
 
         if not user:
-
             user = User.objects.filter(
                 email=email
             ).first()
 
-        # -------------------------------
-        # UPDATE USER
-        # -------------------------------
+        # -------------------------
+        # CREATE / UPDATE USER
+        # -------------------------
 
         if user:
 
             user.google_sub = google_sub
             user.auth_provider = "google"
+            user.first_name = first_name
+            user.last_name = last_name
             user.full_name = full_name
 
             if avatar:
@@ -229,19 +198,19 @@ class GoogleCallbackView(APIView):
                 update_fields=[
                     "google_sub",
                     "auth_provider",
+                    "first_name",
+                    "last_name",
                     "full_name",
                     "avatar",
                 ]
             )
 
-        # -------------------------------
-        # CREATE USER
-        # -------------------------------
-
         else:
 
             user = User.objects.create_user(
                 email=email,
+                first_name=first_name,
+                last_name=last_name,
                 full_name=full_name,
                 google_sub=google_sub,
                 avatar=avatar,
@@ -249,13 +218,11 @@ class GoogleCallbackView(APIView):
                 role="customer",
             )
 
-        # -------------------------------
-        # CREATE JWT
-        # -------------------------------
+        # -------------------------
+        # JWT
+        # -------------------------
 
-        refresh = RefreshToken.for_user(
-            user
-        )
+        refresh = RefreshToken.for_user(user)
 
         access_token = str(
             refresh.access_token
@@ -265,23 +232,19 @@ class GoogleCallbackView(APIView):
             refresh
         )
 
-        # -------------------------------
-        # SEND TOKENS TO EXPO
-        # -------------------------------
+        # -------------------------
+        # SEND TO EXPO
+        # -------------------------
 
         query = urlencode(
             {
-                "access_token":
-                    access_token,
-
-                "refresh_token":
-                    refresh_token,
+                "access_token": access_token,
+                "refresh_token": refresh_token,
             }
         )
 
         redirect_url = (
-            f"{expo_redirect_uri}"
-            f"?{query}"
+            f"{expo_redirect_uri}?{query}"
         )
 
         print(
@@ -289,46 +252,29 @@ class GoogleCallbackView(APIView):
             redirect_url
         )
 
-        # Django rejects exp:// with
-        # HttpResponseRedirect.
-        #
-        # Therefore use a small HTML page
-        # to send the browser to Expo Go.
-
         return HttpResponse(
             f"""
             <!DOCTYPE html>
-
             <html>
-
             <head>
-
                 <meta
                     name="viewport"
-                    content="width=device-width,
-                    initial-scale=1"
+                    content="width=device-width, initial-scale=1"
                 >
-
                 <title>Sira Login</title>
-
             </head>
 
             <body>
 
-                <p>
-                    Completing Sira login...
-                </p>
+                <p>Completing Sira login...</p>
 
                 <script>
-
                     window.location.replace(
                         {redirect_url!r}
                     );
-
                 </script>
 
             </body>
-
             </html>
             """
         )
