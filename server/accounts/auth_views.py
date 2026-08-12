@@ -278,3 +278,4 @@ class GoogleCallbackView(APIView):
             </html>
             """
         )
+
