@@ -5,12 +5,13 @@ import {
   updateMyProviderProfile,
 } from "@/services/providerprofile";
 
-export const useMyProviderProfile = () => {
+export function useMyProviderProfile(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ["my-provider-profile"],
     queryFn: getMyProviderProfile,
+    enabled: options?.enabled ?? true,
   });
-};
+}
 
 export const useUpdateProviderProfile = () => {
   const queryClient = useQueryClient();

@@ -33,7 +33,18 @@ api.interceptors.request.use(
 
     return config;
   },
+  // (error) => {
+  //   return Promise.reject(error);
+  // },
   (error) => {
-    return Promise.reject(error);
+    if (axios.isAxiosError(error)) {
+      console.log("========== CREATE SERVICE ERROR ==========");
+      console.log("STATUS:", error.response?.status);
+      console.log("DATA:", error.response?.data);
+      console.log("URL:", error.config?.url);
+      console.log("METHOD:", error.config?.method);
+    } else {
+      console.log("UNKNOWN ERROR:", error);
+    }
   },
 );
