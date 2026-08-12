@@ -10,57 +10,58 @@ import {
 
 import { useRouter } from "expo-router";
 
-import {
-  useMyProviderProfile,
-  useUpdateProviderProfile,
-} from "@/hooks/useProviderProfile";
-
 import { colors } from "@/styles/global";
+import { useAuth } from "@/context/AuthContext";
+import { useMyUserProfile, useUpdateMyUserProfile } from "@/hooks/useAccounts";
 
 export default function EditProfilePage() {
   const router = useRouter();
 
-  const { data: profile, isLoading } = useMyProviderProfile();
+  // const { user } = useAuth();
+  const { refreshAuth } = useAuth();
 
-  const updateProfile = useUpdateProviderProfile();
+  const { data: profile, isLoading } = useMyUserProfile();
 
-  const [bio, setBio] = useState("");
-  const [phone, setPhone] = useState("");
-  const [city, setCity] = useState("");
-  const [address, setAddress] = useState("");
-  const [experience, setExperience] = useState("");
-  const [languages, setLanguages] = useState("");
+  const updateProfile = useUpdateMyUserProfile();
+
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
 
   useEffect(() => {
     if (!profile) return;
 
-    setBio(profile.bio ?? "");
-    setPhone(profile.phone ?? "");
-    setCity(profile.city ?? "");
-    setAddress(profile.address ?? "");
-    setExperience(String(profile.experience_years ?? ""));
-    setLanguages(profile.languages ?? "");
+    setFirstName(profile.first_name ?? "");
+    setLastName(profile.last_name ?? "");
   }, [profile]);
 
   const handleSave = () => {
-    const formData = new FormData();
-
-    formData.append("bio", bio);
-    formData.append("phone", phone);
-    formData.append("city", city);
-    formData.append("address", address);
-    formData.append("experience_years", experience || "0");
-    formData.append("languages", languages);
-
-    updateProfile.mutate(formData, {
-      onSuccess: () => {
-        router.back();
-      },
-
-      onError: (error) => {
-        console.log("PROFILE UPDATE ERROR:", error);
-      },
+    console.log("SAVING USER PROFILE:", {
+      first_name: firstName,
+      last_name: lastName,
     });
+
+    updateProfile.mutate(
+      {
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+      },
+      {
+        onSuccess: async (updatedUser) => {
+          console.log("USER PROFILE UPDATED:", updatedUser);
+
+          await refreshAuth();
+
+          router.back();
+        },
+
+        onError: (error: any) => {
+          console.log(
+            "USER PROFILE UPDATE ERROR:",
+            error?.response?.data || error,
+          );
+        },
+      },
+    );
   };
 
   if (isLoading) {
@@ -100,32 +101,9 @@ export default function EditProfilePage() {
         Edit Profile
       </Text>
 
-      <Field label="Bio" value={bio} onChangeText={setBio} multiline />
+      <Field label="First Name" value={firstName} onChangeText={setFirstName} />
 
-      <Field
-        label="Phone"
-        value={phone}
-        onChangeText={setPhone}
-        keyboardType="phone-pad"
-      />
-
-      <Field label="City" value={city} onChangeText={setCity} />
-
-      <Field label="Address" value={address} onChangeText={setAddress} />
-
-      <Field
-        label="Experience (years)"
-        value={experience}
-        onChangeText={setExperience}
-        keyboardType="numeric"
-      />
-
-      <Field
-        label="Languages"
-        value={languages}
-        onChangeText={setLanguages}
-        placeholder="Amharic, Afaan Oromo, English"
-      />
+      <Field label="Last Name" value={lastName} onChangeText={setLastName} />
 
       <TouchableOpacity
         onPress={handleSave}
@@ -157,10 +135,11 @@ function Field({
   label,
   value,
   onChangeText,
-  multiline = false,
-  keyboardType,
-  placeholder,
-}: any) {
+}: {
+  label: string;
+  value: string;
+  onChangeText: (value: string) => void;
+}) {
   return (
     <View style={{ marginBottom: 18 }}>
       <Text
@@ -175,17 +154,13 @@ function Field({
       <TextInput
         value={value}
         onChangeText={onChangeText}
-        multiline={multiline}
-        keyboardType={keyboardType}
-        placeholder={placeholder}
         placeholderTextColor={colors.textSecondary}
         style={{
           backgroundColor: colors.surface,
           color: colors.text,
           borderRadius: 14,
           padding: 15,
-          minHeight: multiline ? 110 : 52,
-          textAlignVertical: multiline ? "top" : "center",
+          minHeight: 52,
         }}
       />
     </View>
