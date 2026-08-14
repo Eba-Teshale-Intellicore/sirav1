@@ -16,13 +16,13 @@ from .models.profile import ProviderProfile
 from .models.skill import ProfileSkill
 
 from .serializers import ProviderAvailabilitySerializer, ProviderPortfolioSerializer, ProviderProfileSerializer, ProviderSkillSerializer, ProviderVerificationSerializer
-
+from rest_framework_simplejwt.authentication import JWTAuthentication
 # Create your views here.
-
 class ProviderProfileViewSet(ModelViewSet):
-
     serializer_class = ProviderProfileSerializer
-    permission_classes = [IsAuthenticated,]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get_queryset(self):
         return (
             ProviderProfile.objects
@@ -34,17 +34,15 @@ class ProviderProfileViewSet(ModelViewSet):
                 "availability",
             )
         )
-    def perform_create(self, serializer):
-        serializer.save(
-            user=self.request.user
-        )
-class MyProviderProfileView(RetrieveUpdateAPIView):
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+class MyProviderProfileView(RetrieveUpdateAPIView):
     serializer_class = ProviderProfileSerializer
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
-
         profile, created = ProviderProfile.objects.get_or_create(
             user=self.request.user
         )
@@ -73,12 +71,9 @@ class ProviderVerificationViewSet(ModelViewSet):
   queryset = ProviderVerification.objects.all()
   serializer_class = ProviderVerificationSerializer
   permission_classes = [AllowAny]
-
-
-
-
-
+  
 class BecomeProviderView(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -95,7 +90,7 @@ class BecomeProviderView(APIView):
         provider.experience_years = request.data.get(
             "experience_years", 0
         )
-        provider.language = request.data.get("languages", "")
+        provider.languages = request.data.get("languages", "")
 
         provider.save()
 
@@ -119,7 +114,7 @@ class BecomeProviderView(APIView):
                     "city": provider.city,
                     "address": provider.address,
                     "experience_years": provider.experience_years,
-                    "language": provider.language,
+                    "languages": provider.languages,
                 },
             },
             status=status.HTTP_200_OK,
