@@ -4,9 +4,7 @@ from .auth_views import (
     GoogleStartView,
     GoogleCallbackView,
 )
-from rest_framework_simplejwt.views import (
-    TokenRefreshView,
-)
+
 urlpatterns = [
 
     path(
@@ -20,10 +18,6 @@ urlpatterns = [
         GoogleCallbackView.as_view(),
         name="google-callback",
     ),
-    path(
-    "auth/token/refresh/",
-    TokenRefreshView.as_view(),
-    name="token_refresh",
-),
+
 
 ]

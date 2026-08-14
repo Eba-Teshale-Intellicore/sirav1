@@ -33,14 +33,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       console.log("AUTH TOKEN EXISTS:", Boolean(accessToken));
 
-      // No token
       if (!accessToken) {
         setUser(null);
         setIsAuthenticated(false);
         return;
       }
 
-      // Token exists → ask Django who this user is
       const currentUser = await getMyUser();
 
       console.log("CURRENT USER:", currentUser);
@@ -50,7 +48,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error("AUTH CHECK ERROR:", error);
 
-      // Token may be expired/invalid
       setUser(null);
       setIsAuthenticated(false);
     }
