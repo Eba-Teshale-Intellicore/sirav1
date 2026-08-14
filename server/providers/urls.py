@@ -8,6 +8,7 @@ from .views import (
     ProviderProfileViewSet,
     ProviderSkillViewSet,
     ProviderVerificationViewSet,
+     BecomeProviderView,
 )
 
 router = DefaultRouter()
@@ -25,4 +26,9 @@ urlpatterns = [
         MyProviderProfileView.as_view(),
         name="my-provider-profile",
     ),
+    path(
+        "me/",
+        BecomeProviderView.as_view(),
+        name="become-provider",
+    )
 ]

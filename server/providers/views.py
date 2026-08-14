@@ -1,5 +1,9 @@
 from django.shortcuts import render
+from rest_framework.response import Response
+from rest_framework import status
+
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
@@ -12,6 +16,7 @@ from .models.profile import ProviderProfile
 from .models.skill import ProfileSkill
 
 from .serializers import ProviderAvailabilitySerializer, ProviderPortfolioSerializer, ProviderProfileSerializer, ProviderSkillSerializer, ProviderVerificationSerializer
+
 
 # Create your views here.
 
@@ -70,3 +75,62 @@ class ProviderVerificationViewSet(ModelViewSet):
   serializer_class = ProviderVerificationSerializer
   permission_classes = [AllowAny]
 
+
+
+
+class BecomeProviderView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+
+        user = request.user
+
+        # Already a provider
+        if hasattr(user, "provider_profile"):
+            serializer = ProviderProfileSerializer(
+                user.provider_profile
+            )
+
+            return Response(
+                {
+                    "message": "You are already a provider.",
+                    "user": {
+                        "id": str(user.id),
+                        "role": user.role,
+                    },
+                    "provider": serializer.data,
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        serializer = ProviderProfileSerializer(
+            data=request.data
+        )
+
+        if serializer.is_valid():
+
+            provider = serializer.save(user=user)
+
+            # Change role
+            user.role = "provider"
+            user.save(update_fields=["role"])
+
+            return Response(
+                {
+                    "message": "You are now a provider.",
+                    "user": {
+                        "id": str(user.id),
+                        "role": user.role,
+                    },
+                    "provider": ProviderProfileSerializer(
+                        provider
+                    ).data,
+                },
+                status=status.HTTP_201_CREATED,
+            )
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST,
+        )

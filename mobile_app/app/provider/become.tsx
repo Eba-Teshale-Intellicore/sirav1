@@ -14,6 +14,7 @@ import {
 import { useRouter } from "expo-router";
 
 import { colors } from "@/styles/global";
+import { createProviderProfile } from "@/services/providers";
 
 export default function BecomeProviderPage() {
   const router = useRouter();
@@ -39,7 +40,10 @@ export default function BecomeProviderPage() {
     }
 
     if (!bio.trim()) {
-      Alert.alert("Missing information", "Please tell customers about yourself.");
+      Alert.alert(
+        "Missing information",
+        "Please tell customers about yourself.",
+      );
       return;
     }
 
@@ -52,42 +56,35 @@ export default function BecomeProviderPage() {
       formData.append("phone", phone.trim());
       formData.append("city", city.trim());
       formData.append("address", address.trim());
-      formData.append(
-        "experience_years",
-        experience.trim() || "0"
-      );
+
+      formData.append("experience_years", experience.trim() || "0");
+
       formData.append("languages", languages.trim());
 
-      // TODO:
-      // Replace this with your real provider API mutation.
-      //
-      // await createProviderProfile(formData);
+      console.log("SUBMITTING PROVIDER PROFILE");
 
-      console.log("BECOME PROVIDER DATA:", {
-        bio,
-        phone,
-        city,
-        address,
-        experience,
-        languages,
-      });
+      const data = await createProviderProfile(formData);
+
+      console.log("BECOME PROVIDER RESPONSE:", data);
 
       Alert.alert(
-        "Ready to become a provider",
-        "Your provider application is ready to be submitted.",
+        "Welcome to Sira!",
+        "Your provider profile has been created.",
         [
           {
             text: "Continue",
-            onPress: () => router.back(),
+            onPress: () => {
+              router.replace("/(tabs)/profile");
+            },
           },
-        ]
+        ],
       );
-    } catch (error) {
-      console.error("BECOME PROVIDER ERROR:", error);
+    } catch (error: any) {
+      console.error("BECOME PROVIDER ERROR:", error?.response?.data || error);
 
       Alert.alert(
-        "Something went wrong",
-        "We couldn't submit your provider application."
+        "Unable to become provider",
+        "We couldn't create your provider profile.",
       );
     } finally {
       setSubmitting(false);
@@ -226,10 +223,7 @@ export default function BecomeProviderPage() {
           }}
         >
           {submitting ? (
-            <ActivityIndicator
-              size="small"
-              color={colors.background}
-            />
+            <ActivityIndicator size="small" color={colors.background} />
           ) : (
             <Text
               style={{
@@ -252,8 +246,8 @@ export default function BecomeProviderPage() {
             lineHeight: 18,
           }}
         >
-          You can update your provider information later from your
-          provider profile.
+          You can update your provider information later from your provider
+          profile.
         </Text>
       </ScrollView>
     </KeyboardAvoidingView>

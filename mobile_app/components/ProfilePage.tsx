@@ -430,7 +430,7 @@ export default function ProfilePage() {
               backgroundColor: colors.primary,
               alignItems: "center",
             }}
-            // onPress={() => router.push("/provider/become")}
+            onPress={() => router.push("/provider/become")}
           >
             <Text
               style={{
