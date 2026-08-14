@@ -17,7 +17,6 @@ from .models.skill import ProfileSkill
 
 from .serializers import ProviderAvailabilitySerializer, ProviderPortfolioSerializer, ProviderProfileSerializer, ProviderSkillSerializer, ProviderVerificationSerializer
 
-
 # Create your views here.
 
 class ProviderProfileViewSet(ModelViewSet):
@@ -78,59 +77,51 @@ class ProviderVerificationViewSet(ModelViewSet):
 
 
 
-class BecomeProviderView(APIView):
 
+from .models import ProviderProfile
+class BecomeProviderView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-
         user = request.user
 
-        # Already a provider
-        if hasattr(user, "provider_profile"):
-            serializer = ProviderProfileSerializer(
-                user.provider_profile
-            )
-
-            return Response(
-                {
-                    "message": "You are already a provider.",
-                    "user": {
-                        "id": str(user.id),
-                        "role": user.role,
-                    },
-                    "provider": serializer.data,
-                },
-                status=status.HTTP_200_OK,
-            )
-
-        serializer = ProviderProfileSerializer(
-            data=request.data
+        provider, created = ProviderProfile.objects.get_or_create(
+            user=user
         )
 
-        if serializer.is_valid():
+        provider.bio = request.data.get("bio", "")
+        provider.phone = request.data.get("phone", "")
+        provider.city = request.data.get("city", "")
+        provider.address = request.data.get("address", "")
+        provider.experience_years = request.data.get(
+            "experience_years", 0
+        )
+        provider.language = request.data.get("languages", "")
 
-            provider = serializer.save(user=user)
+        provider.save()
 
-            # Change role
-            user.role = "provider"
-            user.save(update_fields=["role"])
-
-            return Response(
-                {
-                    "message": "You are now a provider.",
-                    "user": {
-                        "id": str(user.id),
-                        "role": user.role,
-                    },
-                    "provider": ProviderProfileSerializer(
-                        provider
-                    ).data,
-                },
-                status=status.HTTP_201_CREATED,
-            )
+        user.role = "provider"
+        user.save(update_fields=["role"])
 
         return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST,
+            {
+                "message": "You are now a Sira provider.",
+                "user": {
+                    "id": str(user.id),
+                    "role": user.role,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "email": user.email,
+                },
+                "provider": {
+                    "id": str(provider.id),
+                    "bio": provider.bio,
+                    "phone": provider.phone,
+                    "city": provider.city,
+                    "address": provider.address,
+                    "experience_years": provider.experience_years,
+                    "language": provider.language,
+                },
+            },
+            status=status.HTTP_200_OK,
         )
