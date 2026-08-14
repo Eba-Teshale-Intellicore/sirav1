@@ -14,8 +14,10 @@ export const addStyles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingTop: 80,
     paddingBottom: 20,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    borderBottomWidth: 10,
+    borderBlockColor: colors.surface,
   },
   head: {
     flexDirection: "row",

@@ -70,7 +70,7 @@ export const HomeHeader = () => {
   // }
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={globalStyles.container}>
       {/* =====================================================
           STICKY SEARCH
       ====================================================== */}
@@ -87,6 +87,7 @@ export const HomeHeader = () => {
             paddingVertical: 20,
             borderBottomLeftRadius: 30,
             borderBottomRightRadius: 30,
+            borderWidth: 1,
             backgroundColor: colors.header,
           }}
         >
@@ -110,38 +111,38 @@ export const HomeHeader = () => {
 
             <View style={globalStyles.header}>
               <View style={globalStyles.homeHeader}>
-                <View>
-                  <Text style={globalStyles.location}>Location</Text>
-                  <TouchableOpacity
-                    onPress={logout}
-                    style={{
-                      marginTop: 10,
-                      paddingVertical: 8,
-                      paddingHorizontal: 12,
-                      backgroundColor: "#ffffff",
-                      borderRadius: 8,
-                      alignSelf: "flex-start",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: "#000000",
-                        fontWeight: "600",
-                      }}
-                    >
-                      Logout
-                    </Text>
-                  </TouchableOpacity>
-
-                  <View style={globalStyles.direction}>
-                    <Ionicons
-                      name="location-outline"
-                      size={20}
-                      style={globalStyles.mapicon}
-                    />
-
+                <View style={globalStyles.direction}>
+                  <Ionicons
+                    name="location-outline"
+                    size={32}
+                    style={globalStyles.mapicon}
+                  />
+                  <View>
                     <Text style={globalStyles.place}>
                       Addis Ababa, Ethiopia
+                    </Text>
+                    {/* <TouchableOpacity
+                      onPress={logout}
+                      style={{
+                        marginTop: 10,
+                        paddingVertical: 8,
+                        paddingHorizontal: 12,
+                        backgroundColor: "#57a900",
+                        borderRadius: 8,
+                        alignSelf: "flex-start",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: "#000000",
+                          fontWeight: "600",
+                        }}
+                      >
+                        Logout
+                      </Text>
+                    </TouchableOpacity> */}
+                    <Text style={globalStyles.location}>
+                      Delivering to your Location
                     </Text>
                   </View>
                 </View>
@@ -165,10 +166,10 @@ export const HomeHeader = () => {
             <View style={globalStyles.categories}>
               <View style={globalStyles.categoriespace}>
                 <Text style={globalStyles.categoryTitle}>
-                  Service Categories
+                  Browse by Categories
                 </Text>
                 <TouchableOpacity onPress={() => router.push("/categories")}>
-                  <Text style={globalStyles.categorySubTitle}>See All</Text>
+                  <Text style={globalStyles.categorySubTitle}>View All</Text>
                 </TouchableOpacity>
               </View>
 
@@ -208,10 +209,12 @@ export const HomeHeader = () => {
 
             <View style={globalStyles.popular}>
               <View style={globalStyles.categoriespace}>
-                <Text style={globalStyles.categoryTitle}>Popular Services</Text>
+                <Text style={globalStyles.categoryTitle}>
+                  Recommend For You
+                </Text>
 
                 <TouchableOpacity onPress={() => router.push("/services")}>
-                  <Text style={globalStyles.categorySubTitle}>See All</Text>
+                  <Text style={globalStyles.categorySubTitle}>View All</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -288,15 +291,14 @@ function SearchBar() {
           placeholderTextColor={colors.textSecondary}
           style={globalStyles.textInput}
         />
+        <TouchableOpacity style={globalStyles.filterIconContainer}>
+          <Ionicons
+            name="options-outline"
+            size={22}
+            style={globalStyles.filterIcon}
+          />
+        </TouchableOpacity>
       </View>
-
-      <TouchableOpacity style={globalStyles.filterIconContainer}>
-        <Ionicons
-          name="options-outline"
-          size={22}
-          style={globalStyles.filterIcon}
-        />
-      </TouchableOpacity>
     </View>
   );
 }
