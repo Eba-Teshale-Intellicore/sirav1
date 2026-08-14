@@ -78,7 +78,6 @@ class ProviderVerificationViewSet(ModelViewSet):
 
 
 
-from .models import ProviderProfile
 class BecomeProviderView(APIView):
     permission_classes = [IsAuthenticated]
 
