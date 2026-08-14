@@ -1,37 +1,42 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { getMyUser, updateMyUser, UpdateMyUserData } from "@/services/accounts";
+import { getMyUser, updateMyUser, UpdateUserData } from "@/services/accounts";
 
-const MY_USER_QUERY_KEY = ["my-user-profile"];
+// =========================================================
+// GET MY USER
+// =========================================================
 
-/**
- * Get currently authenticated user.
- */
 export function useMyUserProfile() {
   return useQuery({
-    queryKey: MY_USER_QUERY_KEY,
+    queryKey: ["my-user-profile"],
     queryFn: getMyUser,
   });
 }
 
-/**
- * Update currently authenticated user.
- */
+// =========================================================
+// UPDATE MY USER
+// =========================================================
+
 export function useUpdateMyUserProfile() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: UpdateMyUserData) => updateMyUser(data),
+    mutationFn: (data: UpdateUserData) => updateMyUser(data),
 
     onSuccess: (updatedUser) => {
-      // Immediately update cached user.
       console.log("REACT QUERY UPDATED USER:", updatedUser);
-      queryClient.setQueryData(MY_USER_QUERY_KEY, updatedUser);
 
-      // Make sure the server is the source of truth.
+      // Immediately update cached user
+      queryClient.setQueryData(["my-user-profile"], updatedUser);
+
+      // Also make sure server data is fresh
       queryClient.invalidateQueries({
-        queryKey: MY_USER_QUERY_KEY,
+        queryKey: ["my-user-profile"],
       });
+    },
+
+    onError: (error) => {
+      console.error("USER PROFILE UPDATE ERROR:", error);
     },
   });
 }

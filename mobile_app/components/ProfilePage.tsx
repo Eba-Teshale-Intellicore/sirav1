@@ -11,38 +11,13 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
-import { colors } from "@/styles/global";
+import { colors, globalStyles } from "@/styles/global";
 import { useAuth } from "@/context/AuthContext";
 import { useMyProviderProfile } from "@/hooks/useProviderProfile";
-
-// export default function ProfilePage() {
-//   return (
-//     <View
-//       style={{
-//         flex: 1,
-//         backgroundColor: "black",
-//         justifyContent: "center",
-//         alignItems: "center",
-//       }}
-//     >
-//       <Text
-//         style={{
-//           color: "white",
-//           fontSize: 30,
-//         }}
-//       >
-//         PROFILE WORKS
-//       </Text>
-//     </View>
-//   );
-// }
 
 export default function ProfilePage() {
   const router = useRouter();
 
-  // const { user, isAuthenticated } = useAuth();
-
-  // const { data: provider, isLoading } = useMyProviderProfile();
   const { user, isAuthenticated } = useAuth();
 
   const isProvider = user?.role === "provider";
@@ -55,7 +30,6 @@ export default function ProfilePage() {
     return null;
   }
 
-  // if (isLoading && user?.role === "provider") {
   if (providerLoading && isProvider) {
     return (
       <View
@@ -70,8 +44,6 @@ export default function ProfilePage() {
       </View>
     );
   }
-
-  // const isProvider = user?.role === "provider";
 
   const avatar = provider?.profile_image || user?.avatar;
 
@@ -90,27 +62,31 @@ export default function ProfilePage() {
 
       <View
         style={{
-          paddingHorizontal: 20,
-          paddingTop: 55,
+          width: "100%",
+          paddingHorizontal: 10,
+          paddingTop: 60,
           paddingBottom: 20,
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
+          borderBottomLeftRadius: 20,
+          borderBottomRightRadius: 20,
+          borderBottomWidth: 10,
+          borderBlockColor: colors.surface,
+          backgroundColor: colors.header,
         }}
       >
         <Text
           style={{
             color: colors.text,
-            fontSize: 26,
+            fontSize: 24,
             fontWeight: "700",
           }}
         >
-          Profile
+          Your Profile
         </Text>
 
-        <TouchableOpacity
-        // onPress={() => router.push("/profile/edit")}
-        >
+        <TouchableOpacity onPress={() => router.push("/profile/edit")}>
           <Ionicons name="create-outline" size={25} color={colors.primary} />
         </TouchableOpacity>
       </View>
@@ -119,8 +95,11 @@ export default function ProfilePage() {
 
       <View
         style={{
+          flexDirection: "row",
           alignItems: "center",
-          paddingVertical: 20,
+          // justifyContent: "center",
+          padding: 20,
+          gap: 20,
         }}
       >
         {avatar ? (
@@ -129,16 +108,17 @@ export default function ProfilePage() {
             style={{
               width: 100,
               height: 100,
-              borderRadius: 50,
+              borderRadius: 90,
+              marginTop: 20,
             }}
           />
         ) : (
           <View
             style={{
-              width: 100,
-              height: 100,
-              borderRadius: 50,
-              backgroundColor: colors.textSecondary,
+              width: 90,
+              height: 90,
+              borderRadius: 90,
+              backgroundColor: colors.primary,
               alignItems: "center",
               justifyContent: "center",
             }}
@@ -146,46 +126,76 @@ export default function ProfilePage() {
             <Ionicons name="person" size={55} color={colors.header} />
           </View>
         )}
-
-        <Text
-          style={{
-            color: colors.text,
-            fontSize: 24,
-            fontWeight: "700",
-            marginTop: 15,
-          }}
-        >
-          {user?.full_name}
-        </Text>
-
-        <Text
-          style={{
-            color: colors.textSecondary,
-            marginTop: 5,
-          }}
-        >
-          {user?.email}
-        </Text>
-
         <View
           style={{
-            marginTop: 10,
-            paddingHorizontal: 14,
-            paddingVertical: 6,
-            borderRadius: 20,
-            backgroundColor: colors.header,
+            alignItems: "center",
           }}
         >
-          <Text
+          <View>
+            <Text
+              style={{
+                color: colors.text,
+                fontSize: 24,
+                fontWeight: "700",
+                marginTop: 15,
+              }}
+            >
+              {user?.full_name}
+            </Text>
+
+            <Text
+              style={{
+                color: colors.textSecondary,
+                marginTop: 5,
+              }}
+            >
+              {user?.email}
+            </Text>
+          </View>
+          <View
             style={{
-              color: colors.primary,
-              fontWeight: "600",
-              textTransform: "capitalize",
+              marginTop: 10,
+              paddingHorizontal: 14,
+              paddingVertical: 6,
+              borderRadius: 20,
+              backgroundColor: colors.primary,
+              marginRight: 70,
             }}
           >
-            {user?.role}
-          </Text>
+            <Text
+              style={{
+                color: colors.text,
+                fontWeight: "600",
+                textTransform: "capitalize",
+              }}
+            >
+              {user?.role}
+            </Text>
+          </View>
         </View>
+        <TouchableOpacity onPress={() => router.push("/profile/edit")}>
+          <View
+            style={{
+              marginTop: 10,
+              paddingHorizontal: 14,
+              paddingVertical: 6,
+              borderRadius: 20,
+              backgroundColor: colors.primary,
+              marginLeft: 10,
+            }}
+          >
+            <Text
+              style={{
+                color: colors.text,
+                fontWeight: "800",
+                textTransform: "capitalize",
+              }}
+            >
+              <Ionicons name="create-outline" size={18} color={colors.text} />
+              Edit
+            </Text>
+          </View>
+        </TouchableOpacity>
       </View>
 
       {/* PROVIDER */}
