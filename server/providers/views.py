@@ -77,6 +77,9 @@ class BecomeProviderView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        print("🔥 BECOME PROVIDER VIEW REACHED")
+        print("USER:", request.user)
+        print("AUTH:", request.auth)
         user = request.user
 
         provider, created = ProviderProfile.objects.get_or_create(

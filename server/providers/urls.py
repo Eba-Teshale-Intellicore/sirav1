@@ -26,6 +26,7 @@ urlpatterns = [
         MyProviderProfileView.as_view(),
         name="my-provider-profile",
     ),
+
     path(
         "me/",
         BecomeProviderView.as_view(),
