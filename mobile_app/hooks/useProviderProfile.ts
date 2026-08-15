@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   getMyProviderProfile,
   updateMyProviderProfile,
+  ProviderProfileUpdateData,
 } from "@/services/providerprofile";
 
 export function useMyProviderProfile(options?: { enabled?: boolean }) {
@@ -17,7 +18,8 @@ export const useUpdateMyProviderProfile = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: updateMyProviderProfile,
+    mutationFn: (data: ProviderProfileUpdateData) =>
+      updateMyProviderProfile(data),
 
     onSuccess: (updatedProvider) => {
       console.log("REACT QUERY UPDATED PROVIDER:", updatedProvider);

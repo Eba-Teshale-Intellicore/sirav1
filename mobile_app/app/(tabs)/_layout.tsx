@@ -5,9 +5,16 @@ import { HapticTab } from "@/components/haptic-tab";
 import { Ionicons } from "@expo/vector-icons";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { colors } from "@/styles/global";
+import { useAuth } from "@/context/AuthContext";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { user, isAuthenticated, isLoading } = useAuth();
+  if (isLoading) {
+    return null;
+  }
+
+  const isProvider = user?.role === "provider";
 
   return (
     <Tabs
@@ -28,17 +35,18 @@ export default function TabLayout() {
           ),
         }}
       />
-
-      <Tabs.Screen
-        name="add"
-        options={{
-          title: "Add",
-          headerShown: false,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="add-circle" size={size} color={color} />
-          ),
-        }}
-      />
+      {isProvider && (
+        <Tabs.Screen
+          name="add"
+          options={{
+            title: "Add",
+            headerShown: false,
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="add-circle" size={size} color={color} />
+            ),
+          }}
+        />
+      )}
 
       <Tabs.Screen
         name="explore"

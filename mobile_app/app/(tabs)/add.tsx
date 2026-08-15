@@ -1,20 +1,17 @@
 import React from "react";
 import { ActivityIndicator, View } from "react-native";
+import { useRouter } from "expo-router";
 
 import AddPage from "@/components/AddPage";
 import LoginPage from "@/components/LoginPage";
 
 import { useAuth } from "@/context/AuthContext";
-
 import { colors } from "@/styles/global";
 
 export default function Add() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
 
-  console.log("ADD TAB:", {
-    isAuthenticated,
-    isLoading,
-  });
+  const { user, isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -32,12 +29,13 @@ export default function Add() {
   }
 
   if (!isAuthenticated) {
-    console.log("ADD TAB → LOGIN PAGE");
-
     return <LoginPage />;
   }
 
-  console.log("ADD TAB → ADD PAGE");
+  if (user?.role !== "provider") {
+    router.replace("/profile");
+    return null;
+  }
 
   return <AddPage />;
 }

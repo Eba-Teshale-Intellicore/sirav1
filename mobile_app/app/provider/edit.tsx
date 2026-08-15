@@ -24,7 +24,21 @@ import {
 export default function ProviderEditProfilePage() {
   const router = useRouter();
 
-  const { data: provider, isLoading, isError } = useMyProviderProfile();
+  // const { data: provider, isLoading, isError } = useMyProviderProfile();
+  const {
+    data: provider,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useMyProviderProfile();
+
+  console.log("EDIT PROVIDER QUERY:", {
+    provider,
+    isLoading,
+    isError,
+    error,
+  });
 
   const updateProvider = useUpdateMyProviderProfile();
 
@@ -167,6 +181,8 @@ export default function ProviderEditProfilePage() {
   // -----------------------------------------
 
   if (isError && !provider) {
+    console.log("PROVIDER EDIT ERROR:", error);
+
     return (
       <View
         style={{
@@ -195,11 +211,11 @@ export default function ProviderEditProfilePage() {
             textAlign: "center",
           }}
         >
-          Please try again.
+          {error instanceof Error ? error.message : "Unknown error"}
         </Text>
 
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => refetch()}
           style={{
             marginTop: 20,
             backgroundColor: colors.primary,
@@ -214,7 +230,7 @@ export default function ProviderEditProfilePage() {
               fontWeight: "700",
             }}
           >
-            Go Back
+            Try Again
           </Text>
         </TouchableOpacity>
       </View>

@@ -14,7 +14,7 @@ export type ProviderProfileUpdateData = {
 // =========================================================
 
 export const getMyProviderProfile = async () => {
-  const response = await api.get("/providers/my-profile/");
+  const response = await api.get("/api/v1/providers/my-profile/");
 
   console.log("PROVIDER PROFILE RESPONSE:", response.data);
 
@@ -30,8 +30,7 @@ export const updateMyProviderProfile = async (
 ) => {
   console.log("UPDATING PROVIDER PROFILE:", data);
 
-  const response = await api.patch("/providers/my-profile/", data);
-
+  const response = await api.patch("/api/v1/providers/my-profile/", data);
   console.log("UPDATED PROVIDER PROFILE FROM DJANGO:", response.data);
 
   return response.data;
