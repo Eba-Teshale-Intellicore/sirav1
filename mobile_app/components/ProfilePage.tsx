@@ -86,9 +86,6 @@ export default function ProfilePage() {
           Your Profile
         </Text>
 
-        {/* <TouchableOpacity onPress={() => router.push("/profile/edit")}>
-          <Ionicons name="create-outline" size={25} color={colors.primary} />
-        </TouchableOpacity> */}
         <TouchableOpacity
           onPress={() =>
             router.push(isProvider ? "/provider/edit" : "/profile/edit")

@@ -9,7 +9,7 @@ from .models.availability import ProviderAvailability
 
 from .models.profile import ProviderProfile
 from .models.skill import ProfileSkill
-
+from services.serializers import ServiceSerializer
 class ProviderSkillSerializer(serializers.ModelSerializer):
 
   service_name = serializers.CharField(source= "service.name", read_only= True)
@@ -102,6 +102,10 @@ class ProviderProfileSerializer(serializers.ModelSerializer):
     portfolios = ProviderPortfolioSerializer(many=True, read_only=True)
     availability = ProviderAvailabilitySerializer(many=True, read_only=True)
     verification = ProviderVerificationSerializer(read_only=True)
+    services = ServiceSerializer(
+        many=True,
+        read_only=True,
+    )
 
     class Meta:
         model = ProviderProfile
