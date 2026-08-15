@@ -13,16 +13,29 @@ export function useMyProviderProfile(options?: { enabled?: boolean }) {
   });
 }
 
-export const useUpdateProviderProfile = () => {
+export const useUpdateMyProviderProfile = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: updateMyProviderProfile,
 
-    onSuccess: () => {
+    onSuccess: (updatedProvider) => {
+      console.log("REACT QUERY UPDATED PROVIDER:", updatedProvider);
+
+      // Immediately update the cache
+      queryClient.setQueryData(["my-provider-profile"], updatedProvider);
+
+      // Then make sure server data is fresh
       queryClient.invalidateQueries({
         queryKey: ["my-provider-profile"],
       });
+    },
+
+    onError: (error: any) => {
+      console.error(
+        "PROVIDER PROFILE UPDATE ERROR:",
+        error?.response?.data || error,
+      );
     },
   });
 };

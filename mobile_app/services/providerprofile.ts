@@ -1,26 +1,38 @@
 import { api } from "@/services/api";
 
+export type ProviderProfileUpdateData = {
+  bio?: string;
+  phone?: string;
+  city?: string;
+  address?: string;
+  experience_years?: number;
+  languages?: string;
+};
+
+// =========================================================
+// GET MY PROVIDER PROFILE
+// =========================================================
+
 export const getMyProviderProfile = async () => {
   const response = await api.get("/providers/my-profile/");
+
+  console.log("PROVIDER PROFILE RESPONSE:", response.data);
+
   return response.data;
 };
 
-export const updateMyProviderProfile = async (formData: FormData) => {
-  // const response = await api.patch("/providers/my-profile/", formData, {
-  //   headers: {
-  //     "Content-Type": "multipart/form-data",
-  //   },
-  // });
-  try {
-    const response = await api.get("/providers/my-profile/");
+// =========================================================
+// UPDATE MY PROVIDER PROFILE
+// =========================================================
 
-    console.log("PROVIDER PROFILE RESPONSE:", response.data);
+export const updateMyProviderProfile = async (
+  data: ProviderProfileUpdateData,
+) => {
+  console.log("UPDATING PROVIDER PROFILE:", data);
 
-    return response.data;
-  } catch (error) {
-    console.error("PROVIDER PROFILE ERROR:", error);
-    throw error;
-  }
+  const response = await api.patch("/providers/my-profile/", data);
 
-  // return response.data;
+  console.log("UPDATED PROVIDER PROFILE FROM DJANGO:", response.data);
+
+  return response.data;
 };
