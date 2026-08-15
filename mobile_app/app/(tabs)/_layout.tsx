@@ -3,13 +3,12 @@ import React from "react";
 
 import { HapticTab } from "@/components/haptic-tab";
 import { Ionicons } from "@expo/vector-icons";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { colors } from "@/styles/global";
 import { useAuth } from "@/context/AuthContext";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
+
   if (isLoading) {
     return null;
   }
@@ -54,7 +53,7 @@ export default function TabLayout() {
           title: "Explore",
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="compass-outline" size={size} color={color} />
+            <Ionicons name="compass" size={size} color={color} />
           ),
         }}
       />
@@ -62,7 +61,6 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: "Profile",
-          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-circle" size={size} color={color} />
           ),

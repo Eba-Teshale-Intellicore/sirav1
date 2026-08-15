@@ -11,18 +11,20 @@ class ServiceCategoryViewSet(ModelViewSet):
   queryset = ServiceCategory.objects.filter(is_active=True)
   serializer_class = ServiceCategorySerializer
   permission_classes = [AllowAny]
-class IsServiceOwner(BasePermission):
+class IsProvider(BasePermission):
 
-    def has_object_permission(
-        self,
-        request,
-        view,
-        obj,
-    ):
-        return obj.provider.user == request.user
+    def has_permission(self, request, view):
+        return (
+            request.user
+            and request.user.is_authenticated
+            and request.user.role == "provider"
+        )
 class ServiceViewSet(ModelViewSet):
     serializer_class = ServiceSerializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [
+    IsAuthenticated,
+    IsProvider,
+]
     def get_permissions(self):
 
         if self.action in ["list", "retrieve"]:
@@ -30,7 +32,7 @@ class ServiceViewSet(ModelViewSet):
 
         return [
             IsAuthenticated(),
-            IsServiceOwner(),
+            IsProvider(),
         ]
     def get_queryset(self):
         return (
