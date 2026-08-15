@@ -37,10 +37,11 @@ export const HomeHeader = () => {
     }
   }, [categories, activeCategory]);
 
-  const filteredServices =
-    activeCategory === null
-      ? services
-      : services.filter((service) => service.category === activeCategory);
+  // const filteredServices =
+  //   activeCategory === null
+  //     ? services
+  //     : services.filter((service) => service.category === activeCategory);
+  const filteredServices = services;
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const y = event.nativeEvent.contentOffset.y;
@@ -121,26 +122,7 @@ export const HomeHeader = () => {
                     <Text style={globalStyles.place}>
                       Addis Ababa, Ethiopia
                     </Text>
-                    {/* <TouchableOpacity
-                      onPress={logout}
-                      style={{
-                        marginTop: 10,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
-                        backgroundColor: "#57a900",
-                        borderRadius: 8,
-                        alignSelf: "flex-start",
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color: "#000000",
-                          fontWeight: "600",
-                        }}
-                      >
-                        Logout
-                      </Text>
-                    </TouchableOpacity> */}
+
                     <Text style={globalStyles.location}>
                       Delivering to your Location
                     </Text>
@@ -180,7 +162,14 @@ export const HomeHeader = () => {
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                   <TouchableOpacity
-                    onPress={() => setActiveCategory(item.id)}
+                    // onPress={() => }
+                    onPress={() => {
+                      router.push({
+                        pathname: "/category/[id]",
+                        params: { id: String(item.id) },
+                      });
+                      setActiveCategory(item.id);
+                    }}
                     style={[
                       globalStyles.categorysContainer,
                       activeCategory === item.id && globalStyles.activeCategory,

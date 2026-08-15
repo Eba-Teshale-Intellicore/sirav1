@@ -3,13 +3,14 @@ import { addStyles } from "@/styles/add";
 import { colors, globalStyles } from "@/styles/global";
 import { Styles } from "@/styles/services";
 import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
 
 const header = ["About", "Gallery", "Review"] as const;
 
 export default function ServiceDetailPage() {
+  const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const { data: services = [] } = useServices();
@@ -30,7 +31,7 @@ export default function ServiceDetailPage() {
       >
         <Text
           style={{
-            color: colors.text,
+            color: colors.primary,
             fontSize: 18,
           }}
         >
@@ -67,7 +68,11 @@ export default function ServiceDetailPage() {
             }}
           >
             {/* Back */}
-            <TouchableOpacity style={globalStyles.backButton2}>
+
+            <TouchableOpacity
+              style={globalStyles.backButton2}
+              onPress={() => router.back()}
+            >
               <Ionicons name="arrow-back" size={26} color={colors.text} />
             </TouchableOpacity>
 
