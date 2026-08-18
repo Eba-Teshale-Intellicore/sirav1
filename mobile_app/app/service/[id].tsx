@@ -1,194 +1,348 @@
 import { useServices } from "@/hooks/useCategories";
-import { addStyles } from "@/styles/add";
-import { colors, globalStyles } from "@/styles/global";
+import { colors, globalStyles, typography } from "@/styles/global";
 import { Styles } from "@/styles/services";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
-const header = ["About", "Gallery", "Review"] as const;
+const tabs = ["About", "Gallery", "Reviews"] as const;
 
 export default function ServiceDetailPage() {
   const router = useRouter();
+
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const { data: services = [] } = useServices();
+  const { data: services = [], isLoading } = useServices();
 
-  const [activeTab, setActiveTab] = useState<(typeof header)[number]>("About");
+  const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>("About");
 
-  const service = services.find((item) => item.id.toString() === id);
+  const service = services.find((item) => String(item.id) === String(id));
 
-  if (!service) {
+  /* =========================
+     LOADING
+  ========================= */
+
+  if (isLoading) {
     return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.background,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Text
-          style={{
-            color: colors.primary,
-            fontSize: 18,
-          }}
-        >
-          Service Not Found
-        </Text>
+      <View style={Styles.loadingContainer}>
+        <ActivityIndicator size="large" color={colors.primary} />
+
+        <Text style={Styles.loadingText}>Loading service...</Text>
       </View>
     );
   }
 
+  /* =========================
+     NOT FOUND
+  ========================= */
+
+  if (!service) {
+    return (
+      <View style={Styles.notFoundContainer}>
+        <View style={Styles.notFoundIcon}>
+          <Ionicons name="search-outline" size={32} color={colors.primary} />
+        </View>
+
+        <Text style={Styles.notFoundTitle}>Service Not Found</Text>
+
+        <Text style={Styles.notFoundText}>
+          This service may have been removed or is no longer available.
+        </Text>
+
+        <TouchableOpacity
+          style={Styles.backButton}
+          onPress={() => router.back()}
+        >
+          <Text style={Styles.backButtonText}>Go Back</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  const price = service.starting_price
+    ? `ETB ${service.starting_price}`
+    : "Request Quote";
+
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: colors.background,
-      }}
-    >
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Service Image */}
-        <View>
+    <View style={Styles.container}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={Styles.scrollContent}
+      >
+        {/* =====================================================
+            HERO IMAGE
+        ===================================================== */}
+
+        <View style={Styles.heroContainer}>
           <Image
-            source={{ uri: service.image_url }}
-            style={globalStyles.serviceImage2}
+            source={{
+              uri: service.image_url || "https://via.placeholder.com/800",
+            }}
+            style={Styles.heroImage}
+            resizeMode="cover"
           />
 
-          <View
-            style={{
-              position: "absolute",
-              top: 40,
-              left: 20,
-              right: 20,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            {/* Back */}
+          {/* IMAGE OVERLAY */}
+
+          <View style={Styles.imageOverlay} />
+
+          {/* TOP ACTIONS */}
+
+          <View style={Styles.topActions}>
+            {/* BACK */}
 
             <TouchableOpacity
-              style={globalStyles.backButton2}
+              activeOpacity={0.8}
+              style={Styles.circleButton}
               onPress={() => router.back()}
             >
-              <Ionicons name="arrow-back" size={26} color={colors.text} />
+              <Ionicons name="arrow-back" size={23} color={colors.text} />
             </TouchableOpacity>
 
-            {/* Right buttons */}
-            <View
-              style={{
-                flexDirection: "row",
-                gap: 10,
-              }}
-            >
-              {/* Favorite */}
-              <TouchableOpacity style={globalStyles.favoriteButton2}>
+            <View style={Styles.rightActions}>
+              {/* FAVORITE */}
+
+              <TouchableOpacity activeOpacity={0.8} style={Styles.circleButton}>
                 <Ionicons name="heart-outline" size={22} color={colors.text} />
               </TouchableOpacity>
 
-              {/* Share */}
-              <TouchableOpacity style={globalStyles.favoriteButton2}>
+              {/* SHARE */}
+
+              <TouchableOpacity activeOpacity={0.8} style={Styles.circleButton}>
                 <Ionicons name="share-outline" size={22} color={colors.text} />
               </TouchableOpacity>
             </View>
           </View>
         </View>
-        {/* Service Information */}
-        <View style={Styles.serviceinfo}>
-          <View
-            style={{
-              flexDirection: "column",
-              justifyContent: "space-between",
-            }}
-          >
-            <Text
-              style={{
-                color: colors.text,
-                fontSize: 24,
-                fontWeight: "700",
-              }}
-            >
-              {service.name}
-            </Text>
 
-            <Ionicons
-              name="location-outline"
-              size={24}
-              color={colors.primary}
-              style={Styles.locationicon}
-            />
+        {/* =====================================================
+            SERVICE INFORMATION
+        ===================================================== */}
+
+        <View style={Styles.serviceInfo}>
+          {/* CATEGORY */}
+
+          <Text style={Styles.category}>
+            {service.category_name || "Home Service"}
+          </Text>
+
+          {/* TITLE */}
+
+          <Text style={Styles.serviceTitle}>{service.name}</Text>
+
+          {/* RATING */}
+
+          <View style={Styles.ratingRow}>
+            <Ionicons name="star" size={18} color={colors.primary} />
+
+            <Text style={Styles.rating}>4.8</Text>
+
+            <Text style={Styles.reviewCount}>• 24 reviews</Text>
           </View>
 
-          {/* Tabs */}
+          {/* LOCATION */}
+
+          <View style={Styles.locationRow}>
+            <Ionicons
+              name="location-outline"
+              size={18}
+              color={colors.primary}
+            />
+
+            <Text style={Styles.locationText}>Available in your area</Text>
+          </View>
+
+          {/* PRICE */}
+
+          <View style={Styles.priceCard}>
+            <View>
+              <Text style={Styles.priceLabel}>Starting price</Text>
+
+              <Text style={Styles.price}>{price}</Text>
+            </View>
+
+            {service.price_type === "hourly" && (
+              <Text style={Styles.priceUnit}>/ hour</Text>
+            )}
+          </View>
+
+          {/* =================================================
+              TABS
+          ================================================= */}
+
           <View style={Styles.tabs}>
-            {header.map((item) => {
-              const active = activeTab === item;
+            {tabs.map((tab) => {
+              const active = activeTab === tab;
 
               return (
                 <TouchableOpacity
-                  key={item}
-                  onPress={() => setActiveTab(item)}
-                  style={[
-                    Styles.tab,
-                    {
-                      borderBottomWidth: active ? 2 : 0,
-                    },
-                  ]}
+                  key={tab}
+                  activeOpacity={0.7}
+                  onPress={() => setActiveTab(tab)}
+                  style={[Styles.tab, active && Styles.activeTab]}
                 >
                   <Text
-                    style={{
-                      color: active ? colors.primary : colors.textSecondary,
-                      fontWeight: active ? "700" : "500",
-                    }}
+                    style={[Styles.tabText, active && Styles.activeTabText]}
                   >
-                    {item}
+                    {tab}
                   </Text>
                 </TouchableOpacity>
               );
             })}
           </View>
 
-          {/* Tab Content */}
-          <View style={Styles.tabcon}>
-            {activeTab === "About" && (
-              <View>
-                <Text style={Styles.tabtitle}>About this service</Text>
+          {/* =================================================
+              ABOUT
+          ================================================= */}
 
-                <Text style={Styles.desc}>
-                  {service.description ||
-                    "No description available for this service."}
-                </Text>
+          {activeTab === "About" && (
+            <View style={Styles.tabContent}>
+              <Text style={Styles.tabTitle}>About this service</Text>
+
+              <Text style={Styles.description}>
+                {service.description ||
+                  "No description available for this service."}
+              </Text>
+
+              {/* FEATURES */}
+
+              <View style={Styles.features}>
+                <Feature
+                  icon="checkmark-circle-outline"
+                  title="Professional service"
+                  description="Quality service from local providers"
+                />
+
+                <Feature
+                  icon="shield-checkmark-outline"
+                  title="Trusted providers"
+                  description="Connect with verified service providers"
+                />
+
+                <Feature
+                  icon="time-outline"
+                  title="Flexible booking"
+                  description="Choose a time that works for you"
+                />
               </View>
-            )}
+            </View>
+          )}
 
-            {activeTab === "Gallery" && (
-              <View>
-                <Text style={Styles.tabtitle}>Gallery</Text>
+          {/* =================================================
+              GALLERY
+          ================================================= */}
 
+          {activeTab === "Gallery" && (
+            <View style={Styles.tabContent}>
+              <Text style={Styles.tabTitle}>Service Gallery</Text>
+
+              <View style={Styles.galleryGrid}>
                 <Image
                   source={{ uri: service.image_url }}
-                  style={{
-                    width: "100%",
-                    height: 220,
-                    borderRadius: 16,
-                  }}
+                  style={Styles.galleryImage}
                   resizeMode="cover"
                 />
               </View>
-            )}
+            </View>
+          )}
 
-            {activeTab === "Review" && (
-              <View>
-                <Text style={Styles.tabtitle}>Reviews</Text>
+          {/* =================================================
+              REVIEWS
+          ================================================= */}
 
-                <Text style={Styles.desc}>No reviews yet.</Text>
+          {activeTab === "Reviews" && (
+            <View style={Styles.tabContent}>
+              <View style={Styles.reviewSummary}>
+                <Text style={Styles.reviewScore}>4.8</Text>
+
+                <View>
+                  <View style={Styles.stars}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Ionicons
+                        key={star}
+                        name="star"
+                        size={17}
+                        color={colors.primary}
+                      />
+                    ))}
+                  </View>
+
+                  <Text style={Styles.reviewText}>Based on 24 reviews</Text>
+                </View>
               </View>
-            )}
-          </View>
+
+              <Text style={Styles.emptyReview}>
+                Customer reviews will appear here.
+              </Text>
+            </View>
+          )}
         </View>
       </ScrollView>
+
+      {/* =====================================================
+          BOOKING BAR
+      ===================================================== */}
+
+      <View style={Styles.bookingBar}>
+        <View>
+          <Text style={Styles.bookingLabel}>Starting from</Text>
+
+          <Text style={Styles.bookingPrice}>{price}</Text>
+        </View>
+
+        <TouchableOpacity
+          activeOpacity={0.85}
+          style={Styles.bookingButton}
+          onPress={() => {
+            // router.push({
+            //   pathname: "/booking/[id]",
+            //   params: {
+            //     id: String(service.id),
+            //   },
+            // });
+          }}
+        >
+          <Text style={Styles.bookingButtonText}>Request Service</Text>
+
+          <Ionicons name="arrow-forward" size={19} color={colors.background} />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+/* =========================================================
+   FEATURE
+========================================================= */
+
+function Feature({
+  icon,
+  title,
+  description,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  title: string;
+  description: string;
+}) {
+  return (
+    <View style={Styles.feature}>
+      <View style={Styles.featureIcon}>
+        <Ionicons name={icon} size={21} color={colors.primary} />
+      </View>
+
+      <View style={Styles.featureContent}>
+        <Text style={Styles.featureTitle}>{title}</Text>
+
+        <Text style={Styles.featureDescription}>{description}</Text>
+      </View>
     </View>
   );
 }

@@ -1,306 +1,563 @@
 import { StyleSheet } from "react-native";
 
+// =========================================================
+// COLORS
+// =========================================================
+
 // export const colors = {
-//   background: "#000000",
-//   header: "#003A26",
-//   surface: "#13191B",
-//   primary: "#F0AF03",
-//   text: "#ffffff",
-//   textSecondary: "#a0a0b0",
-//   alert: "#ff5252",
+//   background: "#FFFFFF",
+//   header: "#FFFFFF",
+//   surface: "#F2F2F2",
+
+//   primary: "#57A900",
+//   // primary: "#F75F50",
+
+//   secondary: "#7C83FD",
+
+//   text: "#000000",
+//   textSecondary: "#777777",
+
+//   alert: "#FF4757",
+//   success: "#4ADE80",
+//   warning: "#FBBF24",
+
+//   border: "#E5E5E5",
+//   muted: "#F8F8F8",
 // };
 export const colors = {
   background: "#FFFFFF",
-  header: "#ffffff",
-  surface: "#DDDDDD",
-  primary: "#F75F50",
-  // primary: "#57a900",
+  header: "#FFFFFF",
+
+  surface: "#F5F6F4",
+  muted: "#FAFAFA",
+
+  primary: "#4F9D00",
+  primaryLight: "#EEF7E8",
+  // primary: "#F75F50",
+  // primaryLight: "#FFF0EE",
+
   secondary: "#7C83FD",
-  text: "#000000",
-  textSecondary: "#A9A3C4",
+
+  text: "#111111",
+  textSecondary: "#777777",
+
+  border: "#E6E6E6",
+
   alert: "#FF4757",
   success: "#4ADE80",
   warning: "#FBBF24",
 };
+// =========================================================
+// TYPOGRAPHY
+// =========================================================
+
 export const typography = {
-  fontFamily: {
-    regular: "Inter_400Regular",
-    medium: "Inter_500Medium",
-    semibold: "Inter_600SemiBold",
-    bold: "Inter_700Bold",
-    // Amharic strings: pass fontFamily: undefined to fall back to system font
+  // =======================================================
+  // DISPLAY
+  // =======================================================
+
+  display: {
+    fontSize: 30,
+    fontWeight: "800" as const,
   },
 
-  size: {
-    display: 30, // splash / empty states
-    h1: 24, // screen titles ("Profile", "Post your Service")
-    h2: 20, // section headers ("Browse by Categories")
-    h3: 17, // card titles, service names
-    bodyLg: 16, // primary readable text
-    body: 14, // default UI text, inputs
-    caption: 12, // secondary text, timestamps, locations
-    micro: 11, // badges, tags, pills
+  // =======================================================
+  // HEADINGS
+  // =======================================================
+
+  pageTitle: {
+    fontSize: 24,
+    fontWeight: "700" as const,
   },
 
-  weight: {
-    regular: "400" as const,
-    medium: "500" as const,
-    semibold: "600" as const,
-    bold: "700" as const,
+  cardHeading: {
+    fontSize: 20,
+    fontWeight: "700" as const,
   },
 
-  lineHeight: {
-    display: 36,
-    h1: 30,
-    h2: 26,
-    h3: 22,
-    bodyLg: 22,
-    body: 20,
-    caption: 16,
-    micro: 14,
+  sectionTitle: {
+    fontSize: 19,
+    fontWeight: "700" as const,
+  },
+
+  title: {
+    fontSize: 18,
+    fontWeight: "600" as const,
+  },
+
+  cardTitle: {
+    fontSize: 17,
+    fontWeight: "700" as const,
+  },
+
+  // =======================================================
+  // ACTION / VALUES
+  // =======================================================
+
+  price: {
+    fontSize: 16,
+    fontWeight: "700" as const,
+  },
+
+  button: {
+    fontSize: 16,
+    fontWeight: "700" as const,
+  },
+
+  stat: {
+    fontSize: 16,
+    fontWeight: "700" as const,
+  },
+
+  input: {
+    fontSize: 16,
+    fontWeight: "400" as const,
+  },
+
+  // =======================================================
+  // BODY
+  // =======================================================
+
+  body: {
+    fontSize: 15,
+    fontWeight: "400" as const,
+  },
+
+  bodyMedium: {
+    fontSize: 15,
+    fontWeight: "500" as const,
+  },
+
+  // =======================================================
+  // SMALL
+  // =======================================================
+
+  subtitle: {
+    fontSize: 14,
+    fontWeight: "500" as const,
+  },
+
+  label: {
+    fontSize: 13,
+    fontWeight: "500" as const,
+  },
+
+  badge: {
+    fontSize: 13,
+    fontWeight: "600" as const,
+  },
+
+  caption: {
+    fontSize: 12,
+    fontWeight: "400" as const,
+  },
+
+  statLabel: {
+    fontSize: 12,
+    fontWeight: "400" as const,
   },
 };
 
+// =========================================================
+// GLOBAL STYLES
+// =========================================================
+
 export const globalStyles = StyleSheet.create({
+  // =======================================================
+  // CONTAINER
+  // =======================================================
+
   container: {
     flex: 1,
     backgroundColor: colors.background,
   },
 
+  // =======================================================
+  // HEADER
+  // =======================================================
+
   header: {
-    flexDirection: "column",
-    alignItems: "center",
     width: "100%",
     backgroundColor: colors.header,
-    paddingHorizontal: 10,
+
+    paddingHorizontal: 16,
     paddingTop: 60,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-    borderBottomWidth: 10,
-    borderBlockColor: colors.surface,
+    paddingBottom: 4,
+
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
 
   homeHeader: {
+    width: "100%",
+
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    width: "100%",
-    // paddingHorizontal: 5,
   },
-  mapicon: {
-    color: colors.primary,
-  },
+
   direction: {
     flexDirection: "row",
+    alignItems: "center",
   },
+
+  // =======================================================
+  // LOCATION
+  // =======================================================
+
+  mapicon: {
+    color: colors.primary,
+    marginRight: 8,
+  },
+
   place: {
-    fontSize: 18,
-    fontWeight: "600",
+    ...typography.title,
     color: colors.text,
   },
 
   location: {
-    fontSize: 14,
-    fontWeight: "500",
+    ...typography.subtitle,
     color: colors.textSecondary,
+    marginTop: 2,
   },
 
+  // =======================================================
+  // NOTIFICATION
+  // =======================================================
+
   notification: {
-    width: 45,
-    height: 45,
-    borderRadius: 22.5,
+    width: 44,
+    height: 44,
+
+    borderRadius: 22,
+
     justifyContent: "center",
     alignItems: "center",
+
     backgroundColor: colors.surface,
   },
+
   notificationIcon: {
     color: colors.primary,
   },
 
+  // =======================================================
+  // SEARCH
+  // =======================================================
+
   searchContainer: {
+    width: "100%",
+
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    gap: 10,
-    color: colors.textSecondary,
-    paddingVertical: 35,
-    paddingHorizontal: 10,
-    width: "100%",
+
+    paddingTop: 24,
+    paddingBottom: 20,
   },
+
   searchInput: {
     flex: 1,
+
+    height: 52,
+
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
-    paddingLeft: 20,
-    marginRight: 20,
-    color: colors.text,
+
+    paddingHorizontal: 16,
+
     backgroundColor: colors.surface,
+
     borderWidth: 1,
-    borderColor: colors.surface,
-    height: 50,
-    borderRadius: 10,
+    borderColor: colors.border,
+
+    borderRadius: 14,
   },
+
+  searchIcon: {
+    marginRight: 10,
+    color: colors.primary,
+  },
+
   textInput: {
+    ...typography.input,
+
     flex: 1,
+
     color: colors.text,
-    fontSize: 16,
   },
+
   filterIconContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    width: 42,
+    height: 42,
+
+    marginLeft: 8,
+
+    borderRadius: 12,
+
     justifyContent: "center",
-    backgroundColor: colors.surface,
-    height: 50,
-    width: 50,
-    borderRadius: 100,
+    alignItems: "center",
+
+    backgroundColor: colors.background,
   },
 
   filterIcon: {
     color: colors.primary,
   },
 
+  // =======================================================
+  // STICKY SEARCH
+  // =======================================================
+
+  stickySearchContainer: {
+    position: "absolute",
+
+    top: 0,
+    left: 0,
+    right: 0,
+
+    zIndex: 100,
+
+    paddingHorizontal: 16,
+    paddingTop: 48,
+    paddingBottom: 8,
+
+    backgroundColor: colors.header,
+
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+
+  stickySearch: {
+    paddingVertical: 0,
+  },
+
+  stickySearchInput: {
+    height: 48,
+  },
+
+  // =======================================================
+  // CATEGORIES
+  // =======================================================
+
   categories: {
     width: "100%",
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    marginTop: 10,
-  },
-  category: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 10,
-    paddingVertical: 10,
-    width: "100%",
+
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 8,
   },
 
   categoriespace: {
+    width: "100%",
+
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    width: "100%",
-    paddingVertical: 10,
+
+    marginBottom: 14,
   },
+
   categoryTitle: {
-    fontSize: 18,
-    fontWeight: "600",
+    ...typography.sectionTitle,
+
     color: colors.text,
   },
+
   categorySubTitle: {
-    fontSize: 14,
-    fontWeight: "500",
-    paddingVertical: 10,
+    ...typography.label,
+
+    color: colors.primary,
   },
-  categoriesIconContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
-    backgroundColor: colors.primary,
-  },
+
   categorysContainer: {
+    height: 48,
+
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
-    paddingRight: 18,
-    paddingLeft: 2,
-    height: 45,
-    borderRadius: 10,
-    backgroundColor: colors.header,
-    borderWidth: 0.1,
+
+    paddingRight: 16,
+    paddingLeft: 5,
+
     marginRight: 10,
+
+    borderRadius: 14,
+
+    backgroundColor: colors.background,
+
+    borderWidth: 1,
+    borderColor: colors.border,
   },
 
   activeCategory: {
-    backgroundColor: colors.surface,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.surface,
-    height: 40,
-    width: 40,
-    borderRadius: 10,
-    borderWidth: 0.1,
+    backgroundColor: colors.primaryLight,
+    borderColor: colors.primary,
   },
 
-  filterIcon2: {
-    color: colors.text,
+  buttonContainer: {
+    width: 38,
+    height: 38,
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    borderRadius: 12,
+
+    backgroundColor: colors.surface,
   },
-  textInput2: {
+
+  categoryName: {
+    ...typography.bodyMedium,
+
     color: colors.text,
-    fontSize: 16,
+
+    marginLeft: 9,
   },
+
+  // =======================================================
+  // RECOMMENDATIONS
+  // =======================================================
+
   popular: {
     width: "100%",
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    marginTop: 10,
+
+    paddingHorizontal: 16,
+    paddingTop: 22,
+    paddingBottom: 4,
   },
+
+  // =======================================================
+  // SERVICE CARD
+  // =======================================================
+
   serviceCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
+    marginHorizontal: 16,
+    marginBottom: 18,
+
+    backgroundColor: colors.background,
+
+    borderRadius: 18,
     overflow: "hidden",
-    marginTop: 15,
+
+    borderWidth: 1,
+    borderColor: colors.border,
   },
 
   serviceImage: {
     width: "100%",
-    height: 200,
+    height: 190,
+
+    backgroundColor: colors.surface,
   },
+
   serviceImage2: {
     width: "100%",
     height: 400,
+
+    backgroundColor: colors.surface,
   },
+
+  // =======================================================
+  // SERVICE ACTIONS
+  // =======================================================
 
   favoriteButton: {
     position: "absolute",
-    top: 10,
-    right: 10,
-    backgroundColor: colors.surface,
+
+    top: 12,
+    right: 12,
+
+    width: 40,
+    height: 40,
+
     borderRadius: 20,
-    padding: 8,
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    backgroundColor: colors.background,
+
+    elevation: 2,
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
   },
+
   backButton: {
     position: "absolute",
-    top: 10,
-    left: 10,
-    backgroundColor: colors.surface,
+
+    top: 12,
+    left: 12,
+
+    width: 40,
+    height: 40,
+
     borderRadius: 20,
-    padding: 8,
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    backgroundColor: colors.background,
   },
+
   favoriteButton2: {
-    backgroundColor: colors.surface,
+    width: 40,
+    height: 40,
+
     borderRadius: 20,
-    padding: 8,
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    backgroundColor: colors.surface,
   },
 
   backButton2: {
-    backgroundColor: colors.surface,
+    width: 40,
+    height: 40,
+
     borderRadius: 20,
-    padding: 8,
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    backgroundColor: colors.surface,
   },
 
+  // =======================================================
+  // SERVICE INFO
+  // =======================================================
+
   serviceInfo: {
-    padding: 15,
+    padding: 16,
   },
 
   serviceTitle: {
+    ...typography.cardTitle,
+
     color: colors.text,
-    fontSize: 18,
-    fontWeight: "700",
   },
 
   servicePrice: {
+    ...typography.price,
+
     color: colors.primary,
-    fontSize: 16,
-    marginTop: 4,
+
+    marginTop: 7,
   },
 
   serviceLocation: {
+    ...typography.caption,
+
     color: colors.textSecondary,
+
     marginLeft: 5,
+  },
+
+  serviceLocationRow: {
+    flexDirection: "row",
+    alignItems: "center",
+
+    marginTop: 8,
   },
 });

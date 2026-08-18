@@ -11,7 +11,8 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
-import { colors, globalStyles } from "@/styles/global";
+import { colors, typography } from "@/styles/global";
+import { profileStyles } from "@/styles/profile";
 import { useAuth } from "@/context/AuthContext";
 import { useMyProviderProfile } from "@/hooks/useProviderProfile";
 
@@ -22,271 +23,207 @@ export default function ProfilePage() {
 
   const isProvider = user?.role === "provider";
 
-  const { data: provider, isLoading: providerLoading } = useMyProviderProfile({
-    enabled: isProvider,
+  const {
+    data: provider,
+    isLoading: providerLoading,
+    isFetching: providerFetching,
+  } = useMyProviderProfile({
+    enabled: isAuthenticated && isProvider,
   });
-
   if (!isAuthenticated) {
     return null;
   }
 
   if (providerLoading && isProvider) {
     return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.background,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
+      <View style={profileStyles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
+
+        <Text style={profileStyles.loadingText}>Loading your profile...</Text>
       </View>
     );
   }
 
   const avatar = provider?.profile_image || user?.avatar;
 
+  const handleEditProfile = () => {
+    router.push(isProvider ? "/provider/edit" : "/profile/edit");
+  };
+
   return (
     <ScrollView
-      style={{
-        flex: 1,
-        backgroundColor: colors.background,
-      }}
-      contentContainerStyle={{
-        paddingBottom: 40,
-      }}
+      style={profileStyles.container}
+      contentContainerStyle={profileStyles.content}
       showsVerticalScrollIndicator={false}
     >
-      {/* HEADER */}
+      {/* =====================================================
+          HEADER
+      ===================================================== */}
 
-      <View
-        style={{
-          width: "100%",
-          paddingHorizontal: 10,
-          paddingTop: 60,
-          paddingBottom: 20,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          borderBottomLeftRadius: 20,
-          borderBottomRightRadius: 20,
-          borderBottomWidth: 10,
-          borderBlockColor: colors.surface,
-          backgroundColor: colors.header,
-        }}
-      >
+      <View style={profileStyles.header}>
         <Text
-          style={{
-            color: colors.text,
-            fontSize: 24,
-            fontWeight: "700",
-          }}
+          style={[
+            typography.pageTitle,
+            {
+              color: colors.text,
+            },
+          ]}
         >
           Your Profile
         </Text>
 
+        {/* KEEP HEADER EDIT */}
         <TouchableOpacity
-          onPress={() =>
-            router.push(isProvider ? "/provider/edit" : "/profile/edit")
-          }
+          activeOpacity={0.7}
+          onPress={handleEditProfile}
+          style={profileStyles.headerEditButton}
         >
-          <Ionicons name="create-outline" size={25} color={colors.primary} />
+          <Ionicons name="create-outline" size={24} color={colors.primary} />
         </TouchableOpacity>
       </View>
 
-      {/* IDENTITY */}
+      {/* =====================================================
+          IDENTITY
+      ===================================================== */}
 
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          // justifyContent: "center",
-          padding: 20,
-          gap: 20,
-        }}
-      >
-        {avatar ? (
-          <Image
-            source={{ uri: avatar }}
-            style={{
-              width: 100,
-              height: 100,
-              borderRadius: 90,
-              marginTop: 20,
-            }}
-          />
-        ) : (
-          <View
-            style={{
-              width: 90,
-              height: 90,
-              borderRadius: 90,
-              backgroundColor: colors.primary,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Ionicons name="person" size={55} color={colors.header} />
-          </View>
-        )}
-        <View
-          style={{
-            alignItems: "center",
-          }}
-        >
-          <View>
+      <View style={profileStyles.identityCard}>
+        <View style={profileStyles.identityRow}>
+          {/* AVATAR */}
+
+          {avatar ? (
+            <Image source={{ uri: avatar }} style={profileStyles.avatar} />
+          ) : (
+            <View style={profileStyles.avatarPlaceholder}>
+              <Ionicons name="person" size={42} color={colors.background} />
+            </View>
+          )}
+
+          {/* USER INFORMATION */}
+
+          <View style={profileStyles.identityInfo}>
             <Text
-              style={{
-                color: colors.text,
-                fontSize: 24,
-                fontWeight: "700",
-                marginTop: 15,
-              }}
+              style={[
+                typography.cardTitle,
+                {
+                  color: colors.text,
+                },
+              ]}
+              numberOfLines={1}
             >
-              {user?.full_name}
+              {user?.full_name || "Your Name"}
             </Text>
 
             <Text
-              style={{
-                color: colors.textSecondary,
-                marginTop: 5,
-              }}
+              style={[
+                typography.body,
+                {
+                  color: colors.textSecondary,
+                  marginTop: 4,
+                },
+              ]}
+              numberOfLines={1}
             >
-              {user?.email}
+              {user?.email || "No email"}
             </Text>
-          </View>
-          <View
-            style={{
-              marginTop: 10,
-              paddingHorizontal: 14,
-              paddingVertical: 6,
-              borderRadius: 20,
-              backgroundColor: colors.primary,
-              marginRight: 70,
-            }}
-          >
-            <Text
-              style={{
-                color: colors.text,
-                fontWeight: "600",
-                textTransform: "capitalize",
-              }}
-            >
-              {user?.role}
-            </Text>
+
+            <View style={profileStyles.badgeRow}>
+              {/* ROLE */}
+
+              <View style={profileStyles.roleBadge}>
+                <Text style={profileStyles.roleBadgeText}>
+                  {user?.role || "customer"}
+                </Text>
+              </View>
+
+              {/* VERIFIED */}
+
+              {isProvider && provider?.is_verified && (
+                <View style={profileStyles.verifiedBadge}>
+                  <Ionicons
+                    name="checkmark-circle"
+                    size={15}
+                    color={colors.primary}
+                  />
+
+                  <Text style={profileStyles.verifiedText}>Verified</Text>
+                </View>
+              )}
+            </View>
           </View>
         </View>
-        <TouchableOpacity onPress={() => router.push("/profile/edit")}>
-          <View
-            style={{
-              marginTop: 10,
-              paddingHorizontal: 14,
-              paddingVertical: 6,
-              borderRadius: 20,
-              backgroundColor: colors.primary,
-              marginLeft: 10,
-            }}
-          >
-            <Text
-              style={{
-                color: colors.text,
-                fontWeight: "800",
-                textTransform: "capitalize",
-              }}
-            >
-              <Ionicons name="create-outline" size={18} color={colors.text} />
-              Edit
-            </Text>
-          </View>
+
+        {/* =================================================
+            EDIT PROFILE BUTTON
+            KEEP THIS TOO
+        ================================================= */}
+
+        <TouchableOpacity
+          style={profileStyles.identityEditButton}
+          activeOpacity={0.8}
+          onPress={handleEditProfile}
+        >
+          <Ionicons name="create-outline" size={18} color={colors.primary} />
+
+          <Text style={profileStyles.identityEditText}>Edit Profile</Text>
         </TouchableOpacity>
       </View>
 
-      {/* PROVIDER */}
+      {/* =====================================================
+          PROVIDER
+      ===================================================== */}
 
       {isProvider ? (
         <>
-          <SectionTitle title="Provider Status" />
+          {/* =================================================
+              REPUTATION
+          ================================================= */}
 
-          <View
-            style={{
-              marginHorizontal: 20,
-              padding: 18,
-              borderRadius: 18,
-              backgroundColor: colors.surface,
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <Ionicons
-                name="checkmark-circle"
-                size={22}
-                color={colors.primary}
-              />
+          <SectionHeader
+            title="Your Reputation"
+            subtitle="How customers see your service"
+          />
 
-              <Text
-                style={{
-                  color: colors.text,
-                  fontSize: 17,
-                  fontWeight: "700",
-                  marginLeft: 8,
-                }}
-              >
-                Provider
-              </Text>
+          <View style={profileStyles.reputationCard}>
+            <Stat
+              icon="star"
+              value={Number(provider?.average_rating ?? 0).toFixed(1)}
+              label="Rating"
+            />
 
-              {provider?.is_verified && (
-                <Text
-                  style={{
-                    color: colors.primary,
-                    marginLeft: 8,
-                  }}
-                >
-                  Verified
-                </Text>
-              )}
-            </View>
+            <View style={profileStyles.statDivider} />
 
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginTop: 20,
-              }}
-            >
-              <Stat
-                icon="star"
-                value={provider?.average_rating ?? "0.00"}
-                label="Rating"
-              />
+            <Stat
+              icon="checkmark-done"
+              value={provider?.completed_jobs ?? 0}
+              label="Jobs"
+            />
 
-              <Stat
-                icon="checkmark-done"
-                value={provider?.completed_jobs ?? 0}
-                label="Jobs"
-              />
+            <View style={profileStyles.statDivider} />
 
-              <Stat
-                icon="ellipse"
-                value={provider?.is_available ? "Available" : "Offline"}
-                label="Status"
-              />
-            </View>
+            <Stat
+              icon={
+                provider?.is_available ? "radio-button-on" : "radio-button-off"
+              }
+              value={provider?.is_available ? "Available" : "Offline"}
+              label="Status"
+            />
           </View>
 
-          {/* ABOUT */}
+          {/* =================================================
+              ABOUT
+          ================================================= */}
 
-          <SectionTitle title="About" />
+          <SectionHeader
+            title="About You"
+            subtitle="Help customers understand your experience"
+          />
 
           <InfoCard
             icon="document-text-outline"
             title="Bio"
             value={
-              provider?.bio || "Add a short description about your experience."
+              provider?.bio ||
+              "Add a short description about yourself and the services you provide."
             }
           />
 
@@ -299,201 +236,180 @@ export default function ProfilePage() {
           <InfoCard
             icon="language-outline"
             title="Languages"
-            value={provider?.languages || "No languages added"}
+            value={provider?.languages || "No languages added yet"}
           />
 
-          {/* CONTACT */}
+          {/* =================================================
+              CONTACT
+          ================================================= */}
 
-          <SectionTitle title="Contact" />
+          <SectionHeader
+            title="Contact Information"
+            subtitle="Information customers can use to reach you"
+          />
 
           <InfoCard
             icon="call-outline"
             title="Phone"
-            value={provider?.phone || "No phone number"}
+            value={provider?.phone || "No phone number added"}
           />
 
           <InfoCard
             icon="location-outline"
             title="City"
-            value={provider?.city || "No city"}
+            value={provider?.city || "No city added"}
           />
 
           <InfoCard
             icon="home-outline"
             title="Address"
-            value={provider?.address || "No address"}
+            value={provider?.address || "No address added"}
           />
 
-          {/* SERVICES */}
+          {/* =================================================
+              SERVICES
+          ================================================= */}
 
-          <SectionTitle title="My Services" />
+          <SectionHeader
+            title="My Services"
+            subtitle="Services you're currently offering"
+          />
 
-          <View style={{ marginHorizontal: 20 }}>
+          <View style={profileStyles.servicesContainer}>
             {provider?.services?.length ? (
               provider.services.map((service: any) => (
-                <TouchableOpacity
+                <ServiceCard
                   key={service.id}
-                  style={{
-                    padding: 16,
-                    marginBottom: 12,
-                    borderRadius: 18,
-                    backgroundColor: colors.surface,
-                  }}
+                  service={service}
                   onPress={() =>
                     router.push({
                       pathname: "/service/[id]",
                       params: {
-                        id: service.id,
+                        id: String(service.id),
                       },
                     })
                   }
-                >
-                  <Text
-                    style={{
-                      color: colors.text,
-                      fontSize: 17,
-                      fontWeight: "700",
-                    }}
-                  >
-                    {service.name}
-                  </Text>
-
-                  <Text
-                    style={{
-                      color: colors.textSecondary,
-                      marginTop: 5,
-                    }}
-                  >
-                    {service.category_name}
-                  </Text>
-
-                  <Text
-                    style={{
-                      color: colors.primary,
-                      fontWeight: "700",
-                      marginTop: 8,
-                    }}
-                  >
-                    {service.starting_price
-                      ? `ETB ${service.starting_price}`
-                      : "Request Quote"}
-                    {service.price_type === "hourly" ? " / hour" : ""}
-                  </Text>
-                </TouchableOpacity>
+                />
               ))
             ) : (
-              <Text
-                style={{
-                  color: colors.textSecondary,
-                }}
-              >
-                {/* You haven't added any services yet. */}
-              </Text>
+              <EmptyServices onPress={() => router.push("/add")} />
             )}
           </View>
-        </>
-      ) : (
-        /* CUSTOMER */
 
-        <View
-          style={{
-            margin: 20,
-            padding: 20,
-            borderRadius: 20,
-            backgroundColor: colors.surface,
-          }}
-        >
-          <Ionicons name="briefcase-outline" size={30} color={colors.primary} />
-
-          <Text
-            style={{
-              color: colors.text,
-              fontSize: 20,
-              fontWeight: "700",
-              marginTop: 12,
-            }}
-          >
-            Become a Provider
-          </Text>
-
-          <Text
-            style={{
-              color: colors.textSecondary,
-              marginTop: 8,
-              lineHeight: 20,
-            }}
-          >
-            Offer your skills and earn from local customers.
-          </Text>
+          {/* =================================================
+              PROVIDER EDIT CTA
+          ================================================= */}
 
           <TouchableOpacity
-            style={{
-              marginTop: 18,
-              padding: 15,
-              borderRadius: 14,
-              backgroundColor: colors.primary,
-              alignItems: "center",
-            }}
-            onPress={() => router.push("/provider/become")}
+            style={profileStyles.bottomEditButton}
+            activeOpacity={0.85}
+            onPress={handleEditProfile}
           >
+            <Ionicons name="create-outline" size={19} color={colors.primary} />
+
+            <Text style={profileStyles.bottomEditText}>
+              Edit Provider Profile
+            </Text>
+          </TouchableOpacity>
+        </>
+      ) : (
+        /* =====================================================
+           CUSTOMER
+        ===================================================== */
+
+        <>
+          <View style={profileStyles.customerCard}>
+            <View style={profileStyles.customerIcon}>
+              <Ionicons
+                name="briefcase-outline"
+                size={28}
+                color={colors.primary}
+              />
+            </View>
+
             <Text
-              style={{
-                color: colors.background,
-                fontWeight: "700",
-              }}
+              style={[
+                typography.sectionTitle,
+                {
+                  color: colors.text,
+                  marginTop: 14,
+                },
+              ]}
             >
               Become a Provider
             </Text>
+
+            <Text style={profileStyles.customerDescription}>
+              Offer your skills and connect with customers who need your
+              services.
+            </Text>
+
+            <TouchableOpacity
+              style={profileStyles.primaryButton}
+              activeOpacity={0.85}
+              onPress={() => router.push("/provider/become")}
+            >
+              <Text style={profileStyles.primaryButtonText}>
+                Become a Provider
+              </Text>
+
+              <Ionicons
+                name="arrow-forward"
+                size={18}
+                color={colors.background}
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* CUSTOMER EDIT */}
+
+          <TouchableOpacity
+            style={profileStyles.bottomEditButton}
+            activeOpacity={0.85}
+            onPress={handleEditProfile}
+          >
+            <Ionicons name="create-outline" size={19} color={colors.primary} />
+
+            <Text style={profileStyles.bottomEditText}>Edit Profile</Text>
           </TouchableOpacity>
-        </View>
+        </>
       )}
-
-      {/* EDIT */}
-
-      <TouchableOpacity
-        style={{
-          marginHorizontal: 20,
-          marginTop: 20,
-          padding: 16,
-          borderRadius: 15,
-          borderWidth: 1,
-          borderColor: colors.primary,
-          alignItems: "center",
-        }}
-        // onPress={() => router.push("/profile/edit")}
-        onPress={() =>
-          router.push(isProvider ? "/provider/edit" : "/profile/edit")
-        }
-      >
-        <Text
-          style={{
-            color: colors.primary,
-            fontWeight: "700",
-          }}
-        >
-          Edit Profile
-        </Text>
-      </TouchableOpacity>
     </ScrollView>
   );
 }
 
-function SectionTitle({ title }: { title: string }) {
+/* =========================================================
+   SECTION HEADER
+========================================================= */
+
+function SectionHeader({
+  title,
+  subtitle,
+}: {
+  title: string;
+  subtitle: string;
+}) {
   return (
-    <Text
-      style={{
-        color: colors.text,
-        fontSize: 19,
-        fontWeight: "700",
-        marginHorizontal: 20,
-        marginTop: 28,
-        marginBottom: 12,
-      }}
-    >
-      {title}
-    </Text>
+    <View style={profileStyles.sectionHeader}>
+      <Text
+        style={[
+          typography.sectionTitle,
+          {
+            color: colors.text,
+          },
+        ]}
+      >
+        {title}
+      </Text>
+
+      <Text style={profileStyles.sectionSubtitle}>{subtitle}</Text>
+    </View>
   );
 }
+
+/* =========================================================
+   INFO CARD
+========================================================= */
 
 function InfoCard({
   icon,
@@ -505,41 +421,23 @@ function InfoCard({
   value: string;
 }) {
   return (
-    <View
-      style={{
-        marginHorizontal: 20,
-        marginBottom: 10,
-        padding: 16,
-        borderRadius: 15,
-        backgroundColor: colors.surface,
-        flexDirection: "row",
-      }}
-    >
-      <Ionicons name={icon} size={22} color={colors.primary} />
+    <View style={profileStyles.infoCard}>
+      <View style={profileStyles.infoIcon}>
+        <Ionicons name={icon} size={21} color={colors.primary} />
+      </View>
 
-      <View style={{ marginLeft: 14, flex: 1 }}>
-        <Text
-          style={{
-            color: colors.textSecondary,
-            fontSize: 13,
-          }}
-        >
-          {title}
-        </Text>
+      <View style={profileStyles.infoContent}>
+        <Text style={profileStyles.infoTitle}>{title}</Text>
 
-        <Text
-          style={{
-            color: colors.text,
-            marginTop: 4,
-            fontSize: 15,
-          }}
-        >
-          {value}
-        </Text>
+        <Text style={profileStyles.infoValue}>{value}</Text>
       </View>
     </View>
   );
 }
+
+/* =========================================================
+   STAT
+========================================================= */
 
 function Stat({
   icon,
@@ -551,28 +449,100 @@ function Stat({
   label: string;
 }) {
   return (
-    <View style={{ alignItems: "center" }}>
+    <View style={profileStyles.stat}>
       <Ionicons name={icon} size={20} color={colors.primary} />
 
-      <Text
-        style={{
-          color: colors.text,
-          fontWeight: "700",
-          marginTop: 5,
-        }}
-      >
-        {value}
+      <Text style={profileStyles.statValue}>{value}</Text>
+
+      <Text style={profileStyles.statLabel}>{label}</Text>
+    </View>
+  );
+}
+
+/* =========================================================
+   SERVICE CARD
+========================================================= */
+
+function ServiceCard({
+  service,
+  onPress,
+}: {
+  service: any;
+  onPress: () => void;
+}) {
+  const isHourly = service.price_type === "hourly";
+
+  return (
+    <TouchableOpacity
+      activeOpacity={0.85}
+      style={profileStyles.serviceCard}
+      onPress={onPress}
+    >
+      {/* SERVICE ICON */}
+
+      <View style={profileStyles.serviceIcon}>
+        <Ionicons name="briefcase-outline" size={23} color={colors.primary} />
+      </View>
+
+      {/* CONTENT */}
+
+      <View style={profileStyles.serviceContent}>
+        <Text style={profileStyles.serviceTitle} numberOfLines={1}>
+          {service.name}
+        </Text>
+
+        <Text style={profileStyles.serviceCategory} numberOfLines={1}>
+          {service.category_name || "Service"}
+        </Text>
+
+        <Text style={profileStyles.servicePrice}>
+          {service.starting_price
+            ? `ETB ${service.starting_price}`
+            : "Request Quote"}
+
+          {isHourly ? " / hour" : ""}
+        </Text>
+      </View>
+
+      {/* ARROW */}
+
+      <View style={profileStyles.serviceArrow}>
+        <Ionicons
+          name="chevron-forward"
+          size={19}
+          color={colors.textSecondary}
+        />
+      </View>
+    </TouchableOpacity>
+  );
+}
+
+/* =========================================================
+   EMPTY SERVICES
+========================================================= */
+
+function EmptyServices({ onPress }: { onPress: () => void }) {
+  return (
+    <View style={profileStyles.emptyServices}>
+      <View style={profileStyles.emptyIcon}>
+        <Ionicons name="briefcase-outline" size={28} color={colors.primary} />
+      </View>
+
+      <Text style={profileStyles.emptyTitle}>No services yet</Text>
+
+      <Text style={profileStyles.emptyDescription}>
+        Add your first service and start connecting with customers.
       </Text>
 
-      <Text
-        style={{
-          color: colors.textSecondary,
-          fontSize: 12,
-          marginTop: 3,
-        }}
+      <TouchableOpacity
+        style={profileStyles.secondaryButton}
+        activeOpacity={0.8}
+        onPress={onPress}
       >
-        {label}
-      </Text>
+        <Ionicons name="add" size={19} color={colors.primary} />
+
+        <Text style={profileStyles.secondaryButtonText}>Add Service</Text>
+      </TouchableOpacity>
     </View>
   );
 }

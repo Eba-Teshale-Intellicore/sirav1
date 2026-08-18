@@ -11,6 +11,7 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
 import { addStyles } from "@/styles/add";
+// import
 import { Styles } from "@/styles/category";
 import { colors } from "@/styles/global";
 import { useCategories } from "@/hooks/useCategories";
@@ -55,11 +56,19 @@ export default function CategoriesPage() {
       {/* HEADER */}
       <View style={addStyles.header}>
         <View style={addStyles.head}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Ionicons name="arrow-back" size={26} style={addStyles.backIcon} />
+          <TouchableOpacity
+            style={addStyles.backButton}
+            activeOpacity={0.7}
+            onPress={() => router.back()}
+          >
+            <Ionicons name="arrow-back" size={22} color={colors.text} />
           </TouchableOpacity>
 
-          <Text style={addStyles.title}>All Categories</Text>
+          <View style={addStyles.titleContainer}>
+            <Text style={addStyles.title}>All Categories</Text>
+
+            <Text style={addStyles.subtitle}>Find the service you need</Text>
+          </View>
         </View>
       </View>
 
@@ -67,38 +76,24 @@ export default function CategoriesPage() {
       <FlatList
         data={categories}
         numColumns={3}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => String(item.id)}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingHorizontal: 12,
-          paddingTop: 20,
-          paddingBottom: 30,
-        }}
-        columnWrapperStyle={{
-          justifyContent: "space-between",
-          marginBottom: 24,
-        }}
+        contentContainerStyle={Styles.grid}
+        columnWrapperStyle={Styles.column}
         renderItem={({ item }) => (
           <TouchableOpacity
-            activeOpacity={0.7}
-            style={{
-              width: "31%",
-              alignItems: "center",
-            }}
+            activeOpacity={0.75}
+            style={Styles.item}
             onPress={() => {
               router.push({
                 pathname: "/category/[id]",
-                params: { id: String(item.id) },
+                params: {
+                  id: String(item.id),
+                },
               });
             }}
           >
-            {/* CIRCLE ICON */}
             <View style={Styles.icon}>
-              {/* <MaterialIcons
-                name={item.icon as keyof typeof MaterialIcons.glyphMap}
-                size={30}
-                color={colors.primary}
-              /> */}
               <MaterialIcons
                 name={
                   item.icon.replace(
@@ -111,7 +106,6 @@ export default function CategoriesPage() {
               />
             </View>
 
-            {/* CATEGORY NAME */}
             <Text style={Styles.text} numberOfLines={2}>
               {item.name}
             </Text>

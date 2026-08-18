@@ -7,14 +7,25 @@ import {
 } from "@/services/providerprofile";
 
 export function useMyProviderProfile(options?: { enabled?: boolean }) {
+  const enabled = options?.enabled ?? true;
+
   return useQuery({
     queryKey: ["my-provider-profile"],
     queryFn: getMyProviderProfile,
-    enabled: options?.enabled ?? true,
+
+    enabled,
+
+    retry: false,
+
+    staleTime: 5 * 60 * 1000,
+
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 }
 
-export const useUpdateMyProviderProfile = () => {
+export function useUpdateMyProviderProfile() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -24,13 +35,7 @@ export const useUpdateMyProviderProfile = () => {
     onSuccess: (updatedProvider) => {
       console.log("REACT QUERY UPDATED PROVIDER:", updatedProvider);
 
-      // Immediately update the cache
       queryClient.setQueryData(["my-provider-profile"], updatedProvider);
-
-      // Then make sure server data is fresh
-      queryClient.invalidateQueries({
-        queryKey: ["my-provider-profile"],
-      });
     },
 
     onError: (error: any) => {
@@ -40,4 +45,4 @@ export const useUpdateMyProviderProfile = () => {
       );
     },
   });
-};
+}

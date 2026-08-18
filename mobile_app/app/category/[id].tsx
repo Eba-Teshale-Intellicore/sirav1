@@ -1,158 +1,277 @@
 import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+
 import { useCategories } from "@/hooks/useCategories";
-import { TouchableOpacity, View, Text, Image, FlatList } from "react-native";
-import { colors, globalStyles } from "@/styles/global";
-import { Ionicons } from "@expo/vector-icons";
+import { colors, typography } from "@/styles/global";
+import { Styles } from "@/styles/categoryDetail";
 
 export default function CategoriesDetailPage() {
   const router = useRouter();
+
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data: categories = [] } = useCategories();
+
+  const { data: categories = [], isLoading } = useCategories();
 
   const [headerHeight, setHeaderHeight] = useState(0);
 
-  const category = categories.find((item) => item.id.toString() === id);
+  const category = categories.find((item) => String(item.id) === String(id));
+
+  /* =====================================================
+     LOADING
+  ===================================================== */
+
+  if (isLoading) {
+    return (
+      <View style={Styles.loadingContainer}>
+        <ActivityIndicator size="large" color={colors.primary} />
+
+        <Text style={Styles.loadingText}>Loading category...</Text>
+      </View>
+    );
+  }
+
+  /* =====================================================
+     NOT FOUND
+  ===================================================== */
 
   if (!category) {
     return (
-      <View style={globalStyles.container}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={26} color={colors.text} />
-        </TouchableOpacity>
+      <View style={Styles.notFoundContainer}>
+        <View style={Styles.notFoundIcon}>
+          <Ionicons name="grid-outline" size={32} color={colors.primary} />
+        </View>
 
-        <Text
-          style={{
-            color: colors.text,
-            fontSize: 18,
-            marginTop: 20,
-          }}
-        >
-          Category not found
+        <Text style={Styles.notFoundTitle}>Category not found</Text>
+
+        <Text style={Styles.notFoundDescription}>
+          This category may no longer be available.
         </Text>
+
+        <TouchableOpacity
+          activeOpacity={0.85}
+          style={Styles.backButton}
+          onPress={() => router.back()}
+        >
+          <Ionicons name="arrow-back" size={18} color={colors.background} />
+
+          <Text style={Styles.backButtonText}>Go Back</Text>
+        </TouchableOpacity>
       </View>
     );
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      {/* =========================
-          FIXED / ABSOLUTE HEADER
-         ========================= */}
+    <View style={Styles.container}>
+      {/* =================================================
+          HEADER
+      ================================================= */}
+
       <View
         onLayout={(event) => {
           const { height } = event.nativeEvent.layout;
           setHeaderHeight(height);
         }}
-        style={[
-          globalStyles.header,
-          {
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-
-            // Layering
-            zIndex: 10,
-            elevation: 10,
-          },
-        ]}
+        style={Styles.header}
       >
-        <View style={globalStyles.homeHeader}>
-          {/* BACK BUTTON */}
-          <TouchableOpacity onPress={() => router.back()}>
-            <Ionicons name="arrow-back" size={26} color={colors.text} />
+        <View style={Styles.headerContent}>
+          {/* BACK */}
+
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={Styles.backIconButton}
+            onPress={() => router.back()}
+          >
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
 
+          {/* CATEGORY ICON */}
+
+          <View style={Styles.categoryIcon}>
+            <MaterialIcons
+              name={
+                category.icon.replace(
+                  /_/g,
+                  "-",
+                ) as keyof typeof MaterialIcons.glyphMap
+              }
+              size={25}
+              color={colors.primary}
+            />
+          </View>
+
           {/* CATEGORY INFO */}
-          <View
-            style={{
-              flex: 1,
-              marginLeft: 15,
-            }}
-          >
-            <Text
-              style={{
-                color: colors.text,
-                fontSize: 20,
-                fontWeight: "700",
-              }}
-            >
+
+          <View style={Styles.headerInfo}>
+            <Text style={Styles.headerTitle} numberOfLines={1}>
               {category.name}
             </Text>
 
-            <Text
-              style={{
-                color: colors.textSecondary,
-                marginTop: 3,
-              }}
-            >
-              {category.services.length} services
+            <Text style={Styles.headerSubtitle}>
+              {category.services.length}{" "}
+              {category.services.length === 1 ? "service" : "services"}
             </Text>
           </View>
         </View>
       </View>
 
-      {/* =========================
-          SERVICES LIST
-         ========================= */}
+      {/* =================================================
+          SERVICES
+      ================================================= */}
+
       <FlatList
         data={category.services}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => String(item.id)}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          // Push first service below the absolute header
-          paddingTop: headerHeight,
-          paddingBottom: 30,
-        }}
+        contentContainerStyle={[
+          Styles.listContent,
+          {
+            paddingTop: headerHeight + 12,
+          },
+        ]}
+        ListHeaderComponent={
+          <View style={Styles.listHeader}>
+            <Text style={Styles.listTitle}>Services in {category.name}</Text>
+
+            <Text style={Styles.listSubtitle}>
+              Find a service that fits what you need.
+            </Text>
+          </View>
+        }
         renderItem={({ item }) => (
-          <TouchableOpacity
-            style={globalStyles.serviceCard}
+          <ServiceCard
+            service={item}
             onPress={() => {
               router.push({
                 pathname: "/service/[id]",
-                params: { id: String(item.id) },
+                params: {
+                  id: String(item.id),
+                },
               });
             }}
-          >
-            {/* SERVICE IMAGE */}
-            <Image
-              source={{ uri: item.image_url }}
-              style={globalStyles.serviceImage}
-            />
-
-            {/* FAVORITE */}
-            <TouchableOpacity style={globalStyles.favoriteButton}>
-              <Ionicons name="heart-outline" size={22} color={colors.text} />
-            </TouchableOpacity>
-
-            {/* SERVICE INFO */}
-            <View style={globalStyles.serviceInfo}>
-              <Text style={globalStyles.serviceTitle}>{item.name}</Text>
-
-              <Text style={globalStyles.servicePrice}>
-                ETB {item.starting_price}
-              </Text>
-
+          />
+        )}
+        ListEmptyComponent={
+          <View style={Styles.emptyContainer}>
+            <View style={Styles.emptyIcon}>
               <Ionicons
-                name="location-outline"
-                size={16}
+                name="briefcase-outline"
+                size={30}
                 color={colors.primary}
               />
             </View>
-          </TouchableOpacity>
-        )}
-        ListEmptyComponent={
-          <Text
-            style={{
-              color: colors.text,
-              padding: 20,
-            }}
-          >
-            No services available.
-          </Text>
+
+            <Text style={Styles.emptyTitle}>No services yet</Text>
+
+            <Text style={Styles.emptyDescription}>
+              There are currently no services available in this category.
+            </Text>
+          </View>
         }
       />
     </View>
+  );
+}
+
+/* =========================================================
+   SERVICE CARD
+========================================================= */
+
+function ServiceCard({
+  service,
+  onPress,
+}: {
+  service: any;
+  onPress: () => void;
+}) {
+  return (
+    <TouchableOpacity
+      activeOpacity={0.88}
+      style={Styles.serviceCard}
+      onPress={onPress}
+    >
+      {/* IMAGE */}
+
+      <View style={Styles.imageContainer}>
+        <Image
+          source={{
+            uri: service.image_url || "https://via.placeholder.com/600",
+          }}
+          style={Styles.serviceImage}
+          resizeMode="cover"
+        />
+
+        {/* FAVORITE */}
+
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={Styles.favoriteButton}
+          onPress={(event) => {
+            event.stopPropagation();
+          }}
+        >
+          <Ionicons name="heart-outline" size={21} color={colors.text} />
+        </TouchableOpacity>
+      </View>
+
+      {/* INFO */}
+
+      <View style={Styles.serviceInfo}>
+        <View style={Styles.serviceTopRow}>
+          <Text style={Styles.serviceTitle} numberOfLines={1}>
+            {service.name}
+          </Text>
+
+          <Ionicons
+            name="chevron-forward"
+            size={19}
+            color={colors.textSecondary}
+          />
+        </View>
+
+        <View style={Styles.categoryRow}>
+          <Ionicons
+            name="briefcase-outline"
+            size={14}
+            color={colors.textSecondary}
+          />
+
+          <Text style={Styles.categoryText} numberOfLines={1}>
+            {service.category_name || "Service"}
+          </Text>
+        </View>
+
+        <View style={Styles.bottomRow}>
+          <Text style={Styles.price}>
+            {service.starting_price
+              ? `ETB ${service.starting_price}`
+              : "Request Quote"}
+          </Text>
+
+          {service.price_type === "hourly" && (
+            <Text style={Styles.priceUnit}>/ hour</Text>
+          )}
+
+          <View style={Styles.location}>
+            <Ionicons
+              name="location-outline"
+              size={15}
+              color={colors.primary}
+            />
+
+            <Text style={Styles.locationText}>Nearby</Text>
+          </View>
+        </View>
+      </View>
+    </TouchableOpacity>
   );
 }

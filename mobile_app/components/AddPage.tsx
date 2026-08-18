@@ -55,7 +55,15 @@ export default function AddPage() {
     formData.append("description", desc);
     formData.append("category", category);
     formData.append("price_type", priceType);
-    formData.append("starting_price", startingPrice);
+
+    if (priceType !== "quote" && startingPrice) {
+      formData.append("starting_price", startingPrice);
+    }
+    formData.append("price_type", priceType);
+
+    if (priceType !== "quote" && startingPrice) {
+      formData.append("starting_price", startingPrice);
+    }
     formData.append("is_active", "true");
 
     if (image) {
@@ -66,8 +74,28 @@ export default function AddPage() {
         type: "image/jpeg",
       } as any);
     }
+    if (!title.trim()) {
+      alert("Please enter a service title.");
+      return;
+    }
+
     if (!category) {
       alert("Please select a category.");
+      return;
+    }
+
+    if (!desc.trim()) {
+      alert("Please describe your service.");
+      return;
+    }
+
+    if (!priceType) {
+      alert("Please select a price type.");
+      return;
+    }
+
+    if (priceType !== "quote" && !startingPrice) {
+      alert("Please enter a starting price.");
       return;
     }
     console.log({
@@ -118,135 +146,244 @@ export default function AddPage() {
   };
 
   return (
-    <ScrollView style={addStyles.container}>
+    <View style={addStyles.container}>
+      {/* =====================================================
+        HEADER
+    ===================================================== */}
+
       <View style={addStyles.header}>
         <View style={addStyles.head}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Ionicons name="arrow-back" size={26} style={addStyles.backIcon} />
+          <TouchableOpacity
+            style={addStyles.backButton}
+            activeOpacity={0.7}
+            onPress={() => router.back()}
+          >
+            <Ionicons name="arrow-back" size={22} style={addStyles.backIcon} />
           </TouchableOpacity>
-          <Text style={addStyles.title}>Post your Service</Text>
+
+          <View style={addStyles.titleContainer}>
+            <Text style={addStyles.title}>Post a Service</Text>
+
+            <Text style={addStyles.subtitle}>
+              Offer your service to customers
+            </Text>
+          </View>
         </View>
       </View>
-      <View style={addStyles.form}>
+
+      {/* =====================================================
+        FORM
+    ===================================================== */}
+
+      <ScrollView style={addStyles.form} showsVerticalScrollIndicator={false}>
         <View style={addStyles.formGroup}>
-          <View style={addStyles.field}>
-            {(titleFocused || title.length > 0) && (
-              <Text style={addStyles.floatingLabel}>Title</Text>
-            )}
-            <TextInput
-              value={title}
-              onChangeText={setTitle}
-              onFocus={() => setTitleFocused(true)}
-              onBlur={() => setTitleFocused(false)}
-              placeholder={titleFocused ? "" : "Title"}
-              placeholderTextColor={colors.textSecondary}
-              style={addStyles.textInput}
-            />
-          </View>
-          <View style={addStyles.field}>
-            {category !== "" && (
-              <Text style={addStyles.floatingLabel}>Category</Text>
-            )}
-            <Picker
-              selectedValue={category}
-              onValueChange={(value) => setCategory(value)}
-              dropdownIconColor={colors.primary}
-              style={{ color: colors.text }}
+          {/* =================================================
+            SERVICE DETAILS
+        ================================================= */}
+
+          <View style={addStyles.section}>
+            <View style={addStyles.sectionHeader}>
+              <Text style={addStyles.sectionTitle}>Service Details</Text>
+
+              <Text style={addStyles.sectionSubtitle}>
+                Tell customers what you offer
+              </Text>
+            </View>
+
+            {/* TITLE */}
+
+            <View
+              style={[addStyles.field, titleFocused && addStyles.fieldFocused]}
             >
-              <Picker.Item label="Select Category" value="" />
+              {(titleFocused || title.length > 0) && (
+                <Text style={addStyles.floatingLabel}>Service Title</Text>
+              )}
 
-              {categories.map((item) => (
-                <Picker.Item key={item.id} label={item.name} value={item.id} />
-              ))}
-            </Picker>
+              <TextInput
+                value={title}
+                onChangeText={setTitle}
+                onFocus={() => setTitleFocused(true)}
+                onBlur={() => setTitleFocused(false)}
+                placeholder={titleFocused ? "" : "Service title"}
+                placeholderTextColor={colors.textSecondary}
+                style={addStyles.textInput}
+              />
+            </View>
+
+            {/* CATEGORY */}
+
+            <View style={addStyles.field}>
+              {category !== "" && (
+                <Text style={addStyles.floatingLabel}>Category</Text>
+              )}
+
+              <View style={addStyles.pickerContainer}>
+                <Picker
+                  selectedValue={category}
+                  onValueChange={(value) => setCategory(value)}
+                  dropdownIconColor={colors.primary}
+                  style={addStyles.picker}
+                >
+                  <Picker.Item label="Select Category" value="" />
+
+                  {categories.map((item) => (
+                    <Picker.Item
+                      key={item.id}
+                      label={item.name}
+                      value={item.id}
+                    />
+                  ))}
+                </Picker>
+              </View>
+            </View>
+
+            {/* DESCRIPTION */}
+
+            <View
+              style={[addStyles.field, descFocused && addStyles.fieldFocused]}
+            >
+              {(descFocused || desc.length > 0) && (
+                <Text style={addStyles.floatingLabel}>Description</Text>
+              )}
+
+              <TextInput
+                value={desc}
+                onChangeText={setDesc}
+                onFocus={() => setDescFocused(true)}
+                onBlur={() => setDescFocused(false)}
+                placeholder={descFocused ? "" : "Describe your service..."}
+                placeholderTextColor={colors.textSecondary}
+                style={addStyles.textArea}
+                multiline
+                numberOfLines={5}
+                textAlignVertical="top"
+              />
+            </View>
           </View>
-          <View style={addStyles.field}>
-            {(descFocused || desc.length > 0) && (
-              <Text style={addStyles.floatingLabel}>Description</Text>
-            )}
 
-            <TextInput
-              value={desc}
-              onChangeText={setDesc}
-              onFocus={() => setDescFocused(true)}
-              onBlur={() => setDescFocused(false)}
-              placeholder={descFocused ? "" : "Description"}
-              placeholderTextColor={colors.textSecondary}
-              style={addStyles.textArea}
-              multiline
-              numberOfLines={5}
-              textAlignVertical="top"
-            />
-          </View>
+          {/* =================================================
+            SERVICE IMAGE
+        ================================================= */}
 
-          <View style={addStyles.field}>
-            {image && (
-              <Text style={addStyles.floatingLabel}>Service Image</Text>
-            )}
+          <View style={addStyles.section}>
+            <View style={addStyles.sectionHeader}>
+              <Text style={addStyles.sectionTitle}>Service Image</Text>
 
-            <TouchableOpacity style={addStyles.imageField} onPress={pickImage}>
+              <Text style={addStyles.sectionSubtitle}>
+                Add a clear image to attract customers
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={[
+                addStyles.imageField,
+                image && addStyles.imageFieldActive,
+              ]}
+              activeOpacity={0.8}
+              onPress={pickImage}
+            >
               {image ? (
                 <Image source={{ uri: image }} style={addStyles.previewImage} />
               ) : (
                 <>
-                  <Ionicons
-                    name="camera-outline"
-                    size={42}
-                    color={colors.textSecondary}
-                  />
+                  <View style={addStyles.imageIconContainer}>
+                    <Ionicons
+                      name="camera-outline"
+                      size={30}
+                      color={colors.primary}
+                    />
+                  </View>
 
-                  <Text style={addStyles.imageTitle}>Tap to upload image</Text>
+                  <Text style={addStyles.imageTitle}>Upload service image</Text>
 
                   <Text style={addStyles.imageSubtitle}>
-                    JPG • PNG • Max 5 MB
+                    JPG or PNG • Max 5 MB
                   </Text>
                 </>
               )}
             </TouchableOpacity>
           </View>
-          <View style={addStyles.field}>
-            {priceType !== "" && (
-              <Text style={addStyles.floatingLabel}>Price Type</Text>
-            )}
-            <Picker
-              selectedValue={priceType}
-              onValueChange={(value) => setPriceType(value)}
-              dropdownIconColor={colors.primary}
-              style={{ color: colors.text }}
-            >
-              <Picker.Item label="Select Price Type" value="" />
-              <Picker.Item label="Hourly" value="hourly" />
-              <Picker.Item label="Fixed Price" value="fixed" />
-              <Picker.Item label="Request Quote" value="quote" />
-            </Picker>
-          </View>
-          <View style={addStyles.field}>
-            {(titleFocused || title.length > 0) && (
-              <Text style={addStyles.floatingLabel}>Starting Price</Text>
-            )}
-            <TextInput
-              value={startingPrice}
-              onChangeText={setStartingPrice}
-              onFocus={() => setTitleFocused(true)}
-              onBlur={() => setTitleFocused(false)}
-              placeholder={titleFocused ? "" : "Starting Price"}
-              placeholderTextColor={colors.textSecondary}
-              style={addStyles.textInput}
-            />
-          </View>
-          <View>
-            <TouchableOpacity
-              style={addStyles.postButton}
-              onPress={handlePost}
-              disabled={isPending}
-            >
-              <Text style={addStyles.postButtonText}>
-                {isPending ? "Posting..." : "Post Service"}
+
+          {/* =================================================
+            PRICING
+        ================================================= */}
+
+          <View style={addStyles.section}>
+            <View style={addStyles.sectionHeader}>
+              <Text style={addStyles.sectionTitle}>Pricing</Text>
+
+              <Text style={addStyles.sectionSubtitle}>
+                Set how customers will be charged
               </Text>
-            </TouchableOpacity>
+            </View>
+
+            {/* PRICE TYPE */}
+
+            <View style={addStyles.field}>
+              {priceType !== "" && (
+                <Text style={addStyles.floatingLabel}>Price Type</Text>
+              )}
+
+              <View style={addStyles.pickerContainer}>
+                <Picker
+                  selectedValue={priceType}
+                  onValueChange={(value) => setPriceType(value)}
+                  dropdownIconColor={colors.primary}
+                  style={addStyles.picker}
+                >
+                  <Picker.Item label="Select Price Type" value="" />
+
+                  <Picker.Item label="Hourly" value="hourly" />
+
+                  <Picker.Item label="Fixed Price" value="fixed" />
+
+                  <Picker.Item label="Request Quote" value="quote" />
+                </Picker>
+              </View>
+            </View>
+
+            {/* STARTING PRICE */}
+
+            <View
+              style={[addStyles.field, priceFocused && addStyles.fieldFocused]}
+            >
+              {(priceFocused || startingPrice.length > 0) && (
+                <Text style={addStyles.floatingLabel}>Starting Price</Text>
+              )}
+
+              <TextInput
+                value={startingPrice}
+                onChangeText={setStartingPrice}
+                onFocus={() => setPriceFocused(true)}
+                onBlur={() => setPriceFocused(false)}
+                placeholder={priceFocused ? "" : "Starting price"}
+                placeholderTextColor={colors.textSecondary}
+                style={addStyles.textInput}
+                keyboardType="numeric"
+              />
+            </View>
+
+            <Text style={addStyles.helperText}>
+              Customers will see this as the starting price.
+            </Text>
           </View>
+
+          {/* =================================================
+            PUBLISH
+        ================================================= */}
+
+          <TouchableOpacity
+            style={addStyles.postButton}
+            activeOpacity={0.85}
+            onPress={handlePost}
+            disabled={isPending}
+          >
+            <Text style={addStyles.postButtonText}>
+              {isPending ? "Publishing..." : "Publish Service"}
+            </Text>
+          </TouchableOpacity>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }

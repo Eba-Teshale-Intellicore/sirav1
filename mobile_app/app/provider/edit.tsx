@@ -16,6 +16,8 @@ import { useRouter } from "expo-router";
 
 import { colors } from "@/styles/global";
 
+import { useAuth } from "@/context/AuthContext";
+
 import {
   useMyProviderProfile,
   useUpdateMyProviderProfile,
@@ -24,23 +26,34 @@ import {
 export default function ProviderEditProfilePage() {
   const router = useRouter();
 
-  // const { data: provider, isLoading, isError } = useMyProviderProfile();
+  const {
+    user,
+    isAuthenticated,
+    isLoading: authLoading,
+    refreshAuth,
+  } = useAuth();
+
+  const isProvider = user?.role === "provider";
+
+  // =====================================================
+  // PROVIDER QUERY
+  // =====================================================
+
   const {
     data: provider,
-    isLoading,
+    isLoading: providerLoading,
     isError,
     error,
     refetch,
-  } = useMyProviderProfile();
-
-  console.log("EDIT PROVIDER QUERY:", {
-    provider,
-    isLoading,
-    isError,
-    error,
+  } = useMyProviderProfile({
+    enabled: isAuthenticated && isProvider,
   });
 
   const updateProvider = useUpdateMyProviderProfile();
+
+  // =====================================================
+  // FORM
+  // =====================================================
 
   const [bio, setBio] = useState("");
   const [phone, setPhone] = useState("");
@@ -49,9 +62,9 @@ export default function ProviderEditProfilePage() {
   const [experience, setExperience] = useState("");
   const [languages, setLanguages] = useState("");
 
-  // -----------------------------------------
+  // =====================================================
   // LOAD PROVIDER DATA
-  // -----------------------------------------
+  // =====================================================
 
   useEffect(() => {
     if (!provider) return;
@@ -71,9 +84,224 @@ export default function ProviderEditProfilePage() {
     setLanguages(provider.languages ?? "");
   }, [provider]);
 
-  // -----------------------------------------
+  // =====================================================
+  // AUTH CHECK
+  // =====================================================
+
+  if (authLoading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          justifyContent: "center",
+          alignItems: "center",
+          padding: 20,
+        }}
+      >
+        <Text
+          style={{
+            color: colors.text,
+            fontSize: 20,
+            fontWeight: "700",
+            textAlign: "center",
+          }}
+        >
+          Please sign in
+        </Text>
+        {/* onPress={() => router.replace("/login")} */}
+
+        <TouchableOpacity
+          style={{
+            marginTop: 20,
+            backgroundColor: colors.primary,
+            paddingHorizontal: 25,
+            paddingVertical: 14,
+            borderRadius: 14,
+          }}
+        >
+          <Text
+            style={{
+              color: colors.background,
+              fontWeight: "700",
+            }}
+          >
+            Sign In
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  // =====================================================
+  // CUSTOMER CHECK
+  // =====================================================
+
+  if (!isProvider) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          justifyContent: "center",
+          alignItems: "center",
+          padding: 24,
+        }}
+      >
+        <Text
+          style={{
+            color: colors.text,
+            fontSize: 22,
+            fontWeight: "800",
+            textAlign: "center",
+          }}
+        >
+          Provider profile unavailable
+        </Text>
+
+        <Text
+          style={{
+            color: colors.textSecondary,
+            fontSize: 15,
+            lineHeight: 22,
+            textAlign: "center",
+            marginTop: 10,
+          }}
+        >
+          You need to become a Sira provider before editing a provider profile.
+        </Text>
+
+        <TouchableOpacity
+          onPress={() => router.replace("/provider/become")}
+          style={{
+            marginTop: 22,
+            backgroundColor: colors.primary,
+            paddingHorizontal: 25,
+            paddingVertical: 14,
+            borderRadius: 14,
+          }}
+        >
+          <Text
+            style={{
+              color: colors.background,
+              fontWeight: "800",
+            }}
+          >
+            Become a Provider
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  // =====================================================
+  // PROVIDER LOADING
+  // =====================================================
+
+  if (providerLoading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <ActivityIndicator size="large" color={colors.primary} />
+
+        <Text
+          style={{
+            color: colors.textSecondary,
+            marginTop: 12,
+          }}
+        >
+          Loading provider profile...
+        </Text>
+      </View>
+    );
+  }
+
+  // =====================================================
+  // PROVIDER ERROR
+  // =====================================================
+
+  if (isError && !provider) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          justifyContent: "center",
+          alignItems: "center",
+          padding: 24,
+        }}
+      >
+        <Text
+          style={{
+            color: colors.text,
+            fontSize: 20,
+            fontWeight: "800",
+            textAlign: "center",
+          }}
+        >
+          Provider profile couldn't be loaded
+        </Text>
+
+        <Text
+          style={{
+            color: colors.textSecondary,
+            textAlign: "center",
+            marginTop: 10,
+            lineHeight: 21,
+          }}
+        >
+          {error instanceof Error
+            ? error.message
+            : "Something went wrong while loading your provider profile."}
+        </Text>
+
+        <TouchableOpacity
+          onPress={() => refetch()}
+          style={{
+            marginTop: 20,
+            backgroundColor: colors.primary,
+            paddingHorizontal: 25,
+            paddingVertical: 14,
+            borderRadius: 14,
+          }}
+        >
+          <Text
+            style={{
+              color: colors.background,
+              fontWeight: "800",
+            }}
+          >
+            Try Again
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  // =====================================================
   // SAVE
-  // -----------------------------------------
+  // =====================================================
 
   const handleSave = () => {
     if (!phone.trim()) {
@@ -107,29 +335,17 @@ export default function ProviderEditProfilePage() {
       return;
     }
 
-    console.log("UPDATING PROVIDER PROFILE:", {
-      bio: bio.trim(),
-      phone: phone.trim(),
-      city: city.trim(),
-      address: address.trim(),
-      experience_years: experienceYears || 0,
-      languages: languages.trim(),
-    });
-
     updateProvider.mutate(
       {
         bio: bio.trim(),
         phone: phone.trim(),
         city: city.trim(),
         address: address.trim(),
-        experience_years: experienceYears || 0,
+        experience_years: experience.trim() ? experienceYears : 0,
         languages: languages.trim(),
       },
-
       {
-        onSuccess: async (updatedProvider) => {
-          console.log("PROVIDER PROFILE UPDATED:", updatedProvider);
-
+        onSuccess: () => {
           Alert.alert(
             "Profile Updated",
             "Your provider profile has been updated successfully.",
@@ -150,96 +366,16 @@ export default function ProviderEditProfilePage() {
 
           Alert.alert(
             "Update failed",
-            "We couldn't update your provider profile.",
+            "We couldn't update your provider profile. Please try again.",
           );
         },
       },
     );
   };
 
-  // -----------------------------------------
-  // LOADING
-  // -----------------------------------------
-
-  if (isLoading) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.background,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
-  }
-
-  // -----------------------------------------
-  // ERROR
-  // -----------------------------------------
-
-  if (isError && !provider) {
-    console.log("PROVIDER EDIT ERROR:", error);
-
-    return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.background,
-          justifyContent: "center",
-          alignItems: "center",
-          padding: 20,
-        }}
-      >
-        <Text
-          style={{
-            color: colors.text,
-            fontSize: 20,
-            fontWeight: "700",
-            textAlign: "center",
-          }}
-        >
-          Provider profile could not be loaded
-        </Text>
-
-        <Text
-          style={{
-            color: colors.textSecondary,
-            marginTop: 10,
-            textAlign: "center",
-          }}
-        >
-          {error instanceof Error ? error.message : "Unknown error"}
-        </Text>
-
-        <TouchableOpacity
-          onPress={() => refetch()}
-          style={{
-            marginTop: 20,
-            backgroundColor: colors.primary,
-            paddingHorizontal: 25,
-            paddingVertical: 14,
-            borderRadius: 14,
-          }}
-        >
-          <Text
-            style={{
-              color: colors.background,
-              fontWeight: "700",
-            }}
-          >
-            Try Again
-          </Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  // -----------------------------------------
+  // =====================================================
   // UI
-  // -----------------------------------------
+  // =====================================================
 
   return (
     <KeyboardAvoidingView
@@ -251,6 +387,7 @@ export default function ProviderEditProfilePage() {
     >
       <ScrollView
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
         style={{
           flex: 1,
           backgroundColor: colors.background,
@@ -259,7 +396,6 @@ export default function ProviderEditProfilePage() {
           padding: 20,
           paddingBottom: 60,
         }}
-        showsVerticalScrollIndicator={false}
       >
         {/* BACK */}
 
@@ -273,7 +409,7 @@ export default function ProviderEditProfilePage() {
             style={{
               color: colors.primary,
               fontSize: 16,
-              fontWeight: "600",
+              fontWeight: "700",
             }}
           >
             ← Back
@@ -409,8 +545,8 @@ export default function ProviderEditProfilePage() {
               textAlign: "center",
             }}
           >
-            Your provider rating, completed jobs, verification status, and
-            availability are managed by Sira and cannot be edited here.
+            Your rating, completed jobs, verification status, and availability
+            are managed by Sira and cannot be edited here.
           </Text>
         </View>
       </ScrollView>
@@ -418,9 +554,9 @@ export default function ProviderEditProfilePage() {
   );
 }
 
-// -----------------------------------------
-// REUSABLE FIELD
-// -----------------------------------------
+// =====================================================
+// FIELD
+// =====================================================
 
 function Field({
   label,

@@ -1,31 +1,53 @@
 import { StyleSheet } from "react-native";
-import { colors } from "./global";
-
-import React from "react";
+import { colors, typography } from "./global";
 
 export const Styles = StyleSheet.create({
   container: {
+    // flex: 1,
     backgroundColor: colors.background,
+    paddingBottom: 280,
   },
+
+  grid: {
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 40,
+  },
+
+  column: {
+    justifyContent: "space-between",
+    marginBottom: 22,
+  },
+
+  item: {
+    width: "31%",
+    alignItems: "center",
+  },
+
   icon: {
     width: 72,
     height: 72,
-    borderRadius: 10,
-    padding: 5,
+
+    borderRadius: 18,
+
     backgroundColor: colors.surface,
-    justifyContent: "center",
+
+    borderWidth: 1,
+    borderColor: colors.border,
+
     alignItems: "center",
+    justifyContent: "center",
+
     marginBottom: 9,
   },
-  image: {
-    width: 48,
-    height: 48,
-    borderRadius: 36,
-  },
+
   text: {
+    ...typography.subtitle,
+
     color: colors.text,
-    fontSize: 14,
-    fontWeight: "600",
+
     textAlign: "center",
+
+    lineHeight: 19,
   },
 });
